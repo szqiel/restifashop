@@ -84,10 +84,10 @@ export default function ProductDetailContent({
   };
 
   return (
-    <div className="max-w-container-max mx-auto w-full pt-[120px] pb-[80px] px-margin-mobile md:px-gutter grid grid-cols-1 lg:grid-cols-12 gap-gutter lg:gap-16 items-start text-left">
+    <div className="max-w-container-max mx-auto w-full py-12 px-margin-mobile md:px-gutter grid grid-cols-1 lg:grid-cols-12 gap-gutter lg:gap-16 items-start text-left">
       
       {/* Left Column: Image Gallery (7 Cols) */}
-      <div className="lg:col-span-7 flex flex-col gap-[12px] sticky top-[120px]">
+      <div className="lg:col-span-7 flex flex-col gap-[12px] sticky top-28">
         {/* Main Display Image */}
         <div className="parallax-container w-full h-[450px] md:h-[768px] overflow-hidden rounded-xl bg-surface-container-low relative border border-outline-variant/10 shadow-sm">
           <Image

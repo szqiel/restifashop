@@ -146,8 +146,8 @@ export default function CheckoutModal() {
               disabled={loading}
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="cth: Siti Aminah"
-              className="w-full border-b border-border-custom bg-transparent px-2 py-3 font-sans text-body-md text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none transition-colors"
+              placeholder="cth: Syair Adharian"
+              className="w-full px-4 py-3 bg-surface border border-outline-variant rounded-lg font-sans text-sm text-on-surface placeholder:text-text-muted focus:border-primary focus:outline-none transition-all shadow-2xs"
             />
           </div>
 
@@ -163,7 +163,7 @@ export default function CheckoutModal() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="cth: 08123456789"
-              className="w-full border-b border-border-custom bg-transparent px-2 py-3 font-sans text-body-md text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none transition-colors"
+              className="w-full px-4 py-3 bg-surface border border-outline-variant rounded-lg font-sans text-sm text-on-surface placeholder:text-text-muted focus:border-primary focus:outline-none transition-all shadow-2xs"
             />
           </div>
 
@@ -178,8 +178,8 @@ export default function CheckoutModal() {
               disabled={loading}
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              placeholder="cth: Jalan Melati No. 12, RT 03/RW 04, Kec. Gajahmungkur, Kota Semarang, Jawa Tengah"
-              className="w-full border-b border-border-custom bg-transparent px-2 py-3 font-sans text-body-md text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none transition-colors resize-none"
+              placeholder="cth: Jalan Melati No. 12, RT 03/RW 04, Kec. Gajahmungkur, Kota Semarang"
+              className="w-full px-4 py-3 bg-surface border border-outline-variant rounded-lg font-sans text-sm text-on-surface placeholder:text-text-muted focus:border-primary focus:outline-none transition-all shadow-2xs resize-none"
             />
           </div>
 
@@ -194,7 +194,7 @@ export default function CheckoutModal() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="cth: siti@example.com"
-              className="w-full border-b border-border-custom bg-transparent px-2 py-3 font-sans text-body-md text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none transition-colors"
+              className="w-full px-4 py-3 bg-surface border border-outline-variant rounded-lg font-sans text-sm text-on-surface placeholder:text-text-muted focus:border-primary focus:outline-none transition-all shadow-2xs"
             />
           </div>
 

@@ -198,7 +198,7 @@ export default async function HomePage() {
                       </p>
                     </div>
                     <span className="font-body-md text-body-md font-bold whitespace-nowrap">
-                      Rp {(displayPrice / 1000).toLocaleString("id-ID")}k
+                      Rp {displayPrice.toLocaleString("id-ID")}
                     </span>
                   </div>
                 </Link>
