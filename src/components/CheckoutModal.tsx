@@ -147,7 +147,7 @@ export default function CheckoutModal() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="cth: Siti Aminah"
-              className="w-full border-b border-border-custom bg-transparent px-2 py-3 font-sans text-body-md text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none transition-colors"
+              className="w-full border-b border-border-custom bg-transparent px-2 py-3 font-sans text-body-md text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none transition-colors"
             />
           </div>
 
@@ -163,7 +163,7 @@ export default function CheckoutModal() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="cth: 08123456789"
-              className="w-full border-b border-border-custom bg-transparent px-2 py-3 font-sans text-body-md text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none transition-colors"
+              className="w-full border-b border-border-custom bg-transparent px-2 py-3 font-sans text-body-md text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none transition-colors"
             />
           </div>
 
@@ -179,7 +179,7 @@ export default function CheckoutModal() {
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder="cth: Jalan Melati No. 12, RT 03/RW 04, Kec. Gajahmungkur, Kota Semarang, Jawa Tengah"
-              className="w-full border-b border-border-custom bg-transparent px-2 py-3 font-sans text-body-md text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none transition-colors resize-none"
+              className="w-full border-b border-border-custom bg-transparent px-2 py-3 font-sans text-body-md text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none transition-colors resize-none"
             />
           </div>
 
@@ -194,7 +194,7 @@ export default function CheckoutModal() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="cth: siti@example.com"
-              className="w-full border-b border-border-custom bg-transparent px-2 py-3 font-sans text-body-md text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none transition-colors"
+              className="w-full border-b border-border-custom bg-transparent px-2 py-3 font-sans text-body-md text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none transition-colors"
             />
           </div>
 
@@ -215,7 +215,7 @@ export default function CheckoutModal() {
             </div>
             <div className="border-t border-border-custom/50 pt-3 mt-3 flex justify-between font-sans text-sm font-bold text-text-primary">
               <span>Subtotal</span>
-              <span className="text-accent text-base">
+              <span className="text-primary text-base font-bold">
                 Rp {totalPrice.toLocaleString("id-ID")}
               </span>
             </div>
@@ -229,7 +229,7 @@ export default function CheckoutModal() {
             <button
               type="submit"
               disabled={loading}
-              className="flex-grow py-4 bg-accent text-white font-sans font-bold text-label rounded-md tracking-widest uppercase transition-all duration-fast hover:opacity-95 disabled:opacity-50 flex items-center justify-center gap-2 btn-tactile"
+              className="flex-grow py-4 bg-on-surface text-surface font-label-caps text-label-caps rounded-full uppercase tracking-widest hover:bg-surface-tint transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 btn-tactile cursor-pointer"
             >
               <Send className="h-4 w-4" />
               {loading ? "Memproses..." : "Konfirmasi & Kirim WA"}
@@ -238,7 +238,7 @@ export default function CheckoutModal() {
               type="button"
               disabled={loading}
               onClick={() => setIsCheckoutOpen(false)}
-              className="py-4 px-6 border border-border-custom text-text-secondary font-sans font-bold text-label rounded-md tracking-widest uppercase hover:bg-surface-dim transition-colors disabled:opacity-50 btn-tactile"
+              className="py-4 px-6 border border-outline-variant text-on-surface-variant font-label-caps text-label-caps rounded-full tracking-widest uppercase hover:bg-surface-dim transition-colors disabled:opacity-50 btn-tactile cursor-pointer"
             >
               Batal
             </button>

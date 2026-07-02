@@ -16,7 +16,7 @@ export default function ProductDetailContent({
   product,
   relatedProducts,
 }: ProductDetailContentProps) {
-  const { addItem, setIsOpen } = useCartStore();
+  const { addItem, setIsOpen, setIsCheckoutOpen } = useCartStore();
 
   const colors = product.colors.length > 0 ? product.colors : ["Standard"];
   const sizes = product.sizes.length > 0 ? product.sizes : ["Standard"];
@@ -66,9 +66,9 @@ export default function ProductDetailContent({
   };
 
   const handleWhatsAppCheckout = () => {
-    // Collect single item order to WhatsApp checkout
+    // Add the single item to cart
     const variantId = `${product.id}-${selectedColor}-${selectedSize}`;
-    const cartItem = {
+    addItem({
       productId: product.id,
       variantId,
       name: product.name,
@@ -77,33 +77,10 @@ export default function ProductDetailContent({
       colorSelected: selectedColor,
       sizeSelected: selectedSize,
       image: product.images[0] || "https://via.placeholder.com/300?text=Bedding",
-    };
+    });
 
-    // Open checkout modal or trigger API orders route for redirect link
-    // Here we can directly generate the orders record to fetch the ORD ID and redirect
-    const dummyForm = {
-      name: "Tamu WhatsApp Checkout",
-      phone: process.env.NEXT_PUBLIC_WHATSAPP_PHONE || "628777750028",
-      address: "Checkout langsung via Halaman Detail Produk",
-      email: "",
-      cartItems: [cartItem],
-    };
-
-    fetch("/api/orders", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(dummyForm),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.redirectUrl) {
-          window.open(data.redirectUrl, "_blank");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        alert("Gagal memproses checkout via WhatsApp.");
-      });
+    // Open the checkout form modal directly
+    setIsCheckoutOpen(true);
   };
 
   return (

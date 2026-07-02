@@ -89,6 +89,9 @@
   --text-body-sm: 0.875rem;
   --text-label-caps: 0.75rem;
 
+  /* Z-Indices */
+  --z-index-modal: 100;
+
   /* Animation & Transitions */
   --animate-fade-in: fade-in 300ms ease-out;
   --animate-scale-up: scale-up 300ms cubic-bezier(0.23, 1, 0.32, 1);
