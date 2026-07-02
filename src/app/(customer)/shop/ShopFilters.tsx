@@ -35,7 +35,7 @@ export default function ShopFilters({
   }, [focusSearch]);
 
   const categories = [
-    { name: "All Collections", id: "all" },
+    { name: "Semua Koleksi", id: "all" },
     { name: "Sprei", id: "sprei" },
     { name: "Bedcover", id: "bedcover" },
     { name: "Selimut", id: "selimut" },
@@ -43,10 +43,10 @@ export default function ShopFilters({
   ];
 
   const sortOptions = [
-    { name: "Newest", id: "newest" },
-    { name: "Best Selling", id: "popular" },
-    { name: "Price: Low to High", id: "price-asc" },
-    { name: "Price: High to Low", id: "price-desc" },
+    { name: "Terbaru", id: "newest" },
+    { name: "Terlaris", id: "popular" },
+    { name: "Harga: Terendah ke Tertinggi", id: "price-asc" },
+    { name: "Harga: Tertinggi ke Terendah", id: "price-desc" },
   ];
 
   const updateFilters = (newCategory: string, newSearch: string, newSort: string) => {
@@ -63,8 +63,8 @@ export default function ShopFilters({
     updateFilters(currentCategory, searchValue, currentSort);
   };
 
-  const activeCategoryName = categories.find((c) => c.id === currentCategory)?.name || "Category";
-  const activeSortName = sortOptions.find((o) => o.id === currentSort)?.name || "Sort By";
+  const activeCategoryName = categories.find((c) => c.id === currentCategory)?.name || "Kategori";
+  const activeSortName = sortOptions.find((o) => o.id === currentSort)?.name || "Urutkan";
 
   return (
     <div className="flex flex-col gap-6 mb-16 pb-8 border-b border-outline-variant/30">
@@ -75,7 +75,7 @@ export default function ShopFilters({
           <input
             ref={searchInputRef}
             type="text"
-            placeholder="Search collections..."
+            placeholder="Cari koleksi..."
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
             className="w-full pl-10 pr-4 py-3 bg-surface border border-outline-variant rounded-lg font-sans text-sm text-on-background focus:border-primary focus:outline-none transition-colors"
@@ -126,7 +126,7 @@ export default function ShopFilters({
               }}
               className="flex items-center space-x-2 border border-outline-variant bg-surface px-4 py-3 rounded-lg font-label-caps text-label-caps text-on-background hover:border-primary transition-colors cursor-pointer"
             >
-              <span>Sort By: {activeSortName}</span>
+              <span>Urutkan: {activeSortName}</span>
               <ChevronDown className="h-4 w-4 text-secondary" />
             </button>
 

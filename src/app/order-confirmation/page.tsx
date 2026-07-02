@@ -28,34 +28,34 @@ export default async function OrderConfirmationPage({ searchParams }: PageProps)
         </p>
 
         {/* Order Details box */}
-        <div className="rounded-md border border-border-custom/50 bg-surface-dim p-4 mb-8">
-          <span className="block font-sans font-bold text-[10px] text-text-muted uppercase tracking-widest mb-1">
+        <div className="rounded-md border border-outline-variant/30 bg-surface-dim p-4 mb-8">
+          <span className="block font-sans font-bold text-[10px] text-on-surface-variant uppercase tracking-widest mb-1">
             Nomor Pesanan Anda
           </span>
-          <span className="font-sans text-lg font-bold text-accent tracking-wide">
+          <span className="font-sans text-lg font-bold text-primary tracking-wide">
             {orderNumber}
           </span>
         </div>
 
         {/* Next Steps Info */}
-        <div className="flex flex-col gap-4 text-left border-t border-border-custom/20 pt-6 mb-8 text-xs text-text-secondary">
-          <h3 className="font-serif text-sm text-text-primary font-semibold mb-1">
+        <div className="flex flex-col gap-4 text-left border-t border-outline-variant/10 pt-6 mb-8 text-xs text-on-surface-variant">
+          <h3 className="font-serif text-sm text-on-surface font-semibold mb-1">
             Langkah Selanjutnya:
           </h3>
           <div className="flex gap-3">
-            <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent font-sans text-[10px] font-bold">
+            <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-sans text-[10px] font-bold">
               1
             </div>
             <p>Jika chat WhatsApp belum terbuka otomatis, silakan periksa aplikasi WhatsApp Anda.</p>
           </div>
           <div className="flex gap-3">
-            <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent font-sans text-[10px] font-bold">
+            <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-sans text-[10px] font-bold">
               2
             </div>
             <p>Admin kami akan segera meninjau pesanan, menghitung ongkos kirim ke alamat Anda, dan membalas chat Anda (biasanya dalam 1 jam).</p>
           </div>
           <div className="flex gap-3">
-            <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent font-sans text-[10px] font-bold">
+            <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-sans text-[10px] font-bold">
               3
             </div>
             <p>Pembayaran dapat dilakukan setelah ongkos kirim disepakati via WhatsApp (Transfer Bank / COD).</p>
@@ -65,7 +65,7 @@ export default async function OrderConfirmationPage({ searchParams }: PageProps)
         {/* Back Button */}
         <Link
           href="/"
-          className="w-full py-4 bg-accent text-white font-sans font-bold text-label rounded-md tracking-widest uppercase transition-all duration-fast hover:opacity-95 flex items-center justify-center gap-2 btn-tactile"
+          className="w-full py-4 bg-on-surface text-surface font-label-caps text-label-caps rounded-full tracking-widest uppercase hover:bg-surface-tint transition-all duration-300 flex items-center justify-center gap-2 btn-tactile cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4" />
           Kembali Berbelanja

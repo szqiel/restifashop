@@ -155,7 +155,7 @@ export default function ProductDetailContent({
           {product.colors.length > 0 && (
             <div className="flex flex-col gap-3">
               <label className="font-label-caps text-label-caps text-on-surface uppercase flex justify-between tracking-wider">
-                <span>Color / Motif</span>
+                <span>Warna / Motif</span>
                 <span className="text-on-surface-variant font-normal normal-case">{selectedColor}</span>
               </label>
               <div className="flex gap-4">
@@ -187,9 +187,9 @@ export default function ProductDetailContent({
           {product.sizes.length > 0 && (
             <div className="flex flex-col gap-3">
               <div className="flex justify-between items-center">
-                <label className="font-label-caps text-label-caps text-on-surface uppercase tracking-wider">Size</label>
+                <label className="font-label-caps text-label-caps text-on-surface uppercase tracking-wider">Ukuran</label>
                 <button className="text-sm underline text-on-surface-variant hover:text-primary transition-colors">
-                  Size Guide
+                  Panduan Ukuran
                 </button>
               </div>
               {/* Segemented control Indicator */}
@@ -228,7 +228,7 @@ export default function ProductDetailContent({
             disabled={product.stock === 0}
             className="w-full bg-on-surface text-surface py-4 px-6 rounded-full font-label-caps text-label-caps uppercase tracking-widest hover:bg-surface-tint transition-all duration-300 active:scale-[0.97] flex items-center justify-center gap-2 shadow-sm cursor-pointer"
           >
-            <span>{addedToCart ? "Added to Cart" : "Add to Cart"}</span>
+            <span>{addedToCart ? "Dimasukkan ke Keranjang" : "Tambah ke Keranjang"}</span>
             <ArrowRight className="h-4.5 w-4.5" />
           </button>
 
@@ -242,12 +242,12 @@ export default function ProductDetailContent({
               <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"></path>
               </svg>
-              Order via WhatsApp
+              Pesan via WhatsApp
             </span>
             <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
           </button>
           <p className="text-center font-body-md text-sm text-on-surface-variant mt-2">
-            Free shipping across Indonesia. 30-day trial.
+            Gratis ongkir ke seluruh Indonesia. Garansi uji coba 30 hari.
           </p>
         </div>
 
@@ -256,15 +256,15 @@ export default function ProductDetailContent({
           {/* Material & Care */}
           <details className="group border-b border-surface-variant py-4 cursor-pointer" open>
             <summary className="flex justify-between items-center font-body-lg text-body-lg text-on-surface list-none focus:outline-none select-none">
-              <span>Material & Care</span>
+              <span>Bahan & Perawatan</span>
               <ChevronDown className="h-5 w-5 transform group-open:rotate-180 transition-transform duration-300 text-secondary" />
             </summary>
             <div className="pt-4 font-body-md text-sm text-on-surface-variant space-y-2 leading-relaxed">
-              <p>{product.material || "100% Long-staple organic cotton, woven for an exceptionally crisp yet soft feel."}</p>
+              <p>{product.material || "100% Serat organik pilihan, ditenun halus untuk memberikan kelembutan maksimal dan kenyamanan tidur terbaik."}</p>
               <ul className="list-disc pl-5 space-y-1">
                 <li>{product.care_instructions || "Cuci dengan air dingin menggunakan putaran mesin cuci lambat."}</li>
-                <li>Tumble dry low, remove promptly</li>
-                <li>Do not bleach or use fabric softeners</li>
+                <li>Keringkan dengan mesin pengering putaran rendah, segera keluarkan setelah kering.</li>
+                <li>Jangan gunakan pemutih atau pelembut pakaian secara berlebihan.</li>
               </ul>
             </div>
           </details>
@@ -272,12 +272,12 @@ export default function ProductDetailContent({
           {/* Shipping & Returns */}
           <details className="group border-b border-surface-variant py-4 cursor-pointer">
             <summary className="flex justify-between items-center font-body-lg text-body-lg text-on-surface list-none focus:outline-none select-none">
-              <span>Shipping & Returns</span>
+              <span>Pengiriman & Pengembalian</span>
               <ChevronDown className="h-5 w-5 transform group-open:rotate-180 transition-transform duration-300 text-secondary" />
             </summary>
             <div className="pt-4 font-body-md text-sm text-on-surface-variant space-y-2 leading-relaxed">
-              <p>Complimentary express shipping across Java & Bali (2-3 business days). Outer islands may take 4-7 business days.</p>
-              <p>If you're not completely satisfied, return it within 30 days for a full refund.</p>
+              <p>Pengiriman ekspres gratis di Pulau Jawa & Bali (2-3 hari kerja). Kepulauan luar membutuhkan waktu 4-7 hari kerja.</p>
+              <p>Jika Anda tidak sepenuhnya puas dengan kualitas produk, kembalikan dalam waktu 30 hari untuk pengembalian dana penuh.</p>
             </div>
           </details>
         </div>

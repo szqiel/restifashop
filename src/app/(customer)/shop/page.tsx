@@ -120,9 +120,9 @@ export default async function ShopPage({ searchParams }: PageProps) {
       {products.length === 0 ? (
         <div className="flex flex-col items-center justify-center text-center py-20 border border-dashed border-outline-variant/30 rounded-xl bg-white">
           <HelpCircle className="h-16 w-16 text-secondary mb-4 stroke-[1.5]" />
-          <h3 className="font-serif text-h2 text-text-primary mb-2">No Collections Found</h3>
+          <h3 className="font-serif text-h2 text-text-primary mb-2">Koleksi Tidak Ditemukan</h3>
           <p className="font-sans text-sm text-text-secondary max-w-[280px]">
-            Try adjusting your search criteria or select another collection tab.
+            Coba sesuaikan kata kunci pencarian Anda atau pilih kategori lainnya.
           </p>
         </div>
       ) : (
@@ -153,7 +153,7 @@ export default async function ShopPage({ searchParams }: PageProps) {
                   {product.stock === 0 && (
                     <div className="absolute inset-0 bg-black/30 backdrop-blur-xs flex items-center justify-center">
                       <span className="bg-error text-white font-label-caps text-label-caps py-2 px-4 rounded-md">
-                        OUT OF STOCK
+                        STOK HABIS
                       </span>
                     </div>
                   )}
@@ -198,13 +198,13 @@ export default async function ShopPage({ searchParams }: PageProps) {
                         The Resort Collection
                       </h4>
                       <p className="font-body-md text-xs md:text-sm text-secondary mb-3">
-                        Experience five-star luxury every night in your master suite.
+                        Rasakan kemewahan hotel bintang lima setiap malam di kamar tidur utama Anda.
                       </p>
                       <Link
                         href="/shop?category=bedcover"
                         className="bg-primary-container text-on-primary-container px-4 py-2 font-label-caps text-label-caps hover:bg-primary hover:text-on-primary transition-colors duration-200 rounded inline-block text-xs uppercase"
                       >
-                        Explore Set
+                        Lihat Koleksi
                       </Link>
                     </div>
                   </div>

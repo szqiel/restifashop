@@ -40,13 +40,13 @@ export default async function HomePage() {
               Artistry in Every Thread.
             </h1>
             <p className="font-body-lg text-body-lg text-on-surface-variant max-w-md">
-              Experience the pinnacle of Indonesian craftsmanship. Premium bedding designed for those who appreciate the quiet luxury of a curated home.
+              Rasakan puncak keahlian pengrajin Indonesia. Perlengkapan tidur premium yang dirancang khusus untuk Anda yang menghargai kemewahan dalam kesederhanaan.
             </p>
             <Link
               href="/shop"
               className="inline-flex items-center justify-center bg-primary-container text-on-primary-container font-label-caps text-label-caps px-8 py-4 rounded-xl hover:scale-95 transition-transform duration-300 shadow-[0_4px_14px_0_rgba(212,175,55,0.39)] uppercase tracking-wider"
             >
-              Shop Now
+              Beli Sekarang
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </div>
@@ -73,7 +73,7 @@ export default async function HomePage() {
               href="/shop"
               className="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors border-b border-transparent hover:border-primary pb-1 hidden md:block uppercase tracking-wider"
             >
-              View All Collections
+              Lihat Semua Koleksi
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-element-gap md:gap-gutter auto-rows-[300px] md:auto-rows-[400px]">
@@ -94,7 +94,7 @@ export default async function HomePage() {
               <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end text-left">
                 <div>
                   <span className="font-label-caps text-label-caps text-white/80 block mb-2 uppercase tracking-wider">
-                    Collection
+                    Koleksi
                   </span>
                   <h3 className="font-headline-sm text-headline-sm text-white">Bedcover</h3>
                 </div>
@@ -121,7 +121,7 @@ export default async function HomePage() {
               <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end text-left">
                 <div>
                   <span className="font-label-caps text-label-caps text-white/80 block mb-2 uppercase tracking-wider">
-                    Essentials
+                    Koleksi Utama
                   </span>
                   <h3 className="font-headline-sm text-headline-sm text-white">Sprei</h3>
                 </div>
@@ -148,7 +148,7 @@ export default async function HomePage() {
               <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end text-left">
                 <div>
                   <span className="font-label-caps text-label-caps text-white/80 block mb-2 uppercase tracking-wider">
-                    Comfort
+                    Kenyamanan
                   </span>
                   <h3 className="font-headline-sm text-headline-sm text-white">Selimut</h3>
                 </div>
@@ -167,7 +167,7 @@ export default async function HomePage() {
           <div className="text-center mb-16">
             <h2 className="font-headline-md text-headline-md text-on-surface mb-4">New Arrivals</h2>
             <p className="font-body-md text-body-md text-on-surface-variant max-w-xl mx-auto">
-              Discover the latest additions to our gallery, meticulously crafted to elevate your sanctuary.
+              Temukan koleksi sprei dan bedcover terbaru kami, dirancang dengan ketelitian tinggi untuk menghadirkan kenyamanan tidur terbaik di kamar tidur Anda.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-element-gap gap-y-12">
