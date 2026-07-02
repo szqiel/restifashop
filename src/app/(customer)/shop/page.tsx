@@ -1,0 +1,221 @@
+import Link from "next/link";
+import Image from "next/image";
+import { supabase } from "@/lib/supabase";
+import { Product } from "@/types";
+import { HelpCircle } from "lucide-react";
+import ShopFilters from "./ShopFilters";
+import { MOCK_PRODUCTS } from "@/lib/mockData";
+
+interface PageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+async function getProducts(params: {
+  category?: string;
+  search?: string;
+  sort?: string;
+}): Promise<Product[]> {
+  try {
+    const isPlaceholder = !process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder-url");
+    if (isPlaceholder) {
+      return getLocalMockProducts(params);
+    }
+    let query = supabase.from("products").select("*");
+
+    if (params.category && params.category !== "all") {
+      query = query.eq("category", params.category);
+    }
+
+    if (params.search) {
+      query = query.ilike("name", `%${params.search}%`);
+    }
+
+    // Apply sorting
+    if (params.sort === "price-asc") {
+      query = query.order("price", { ascending: true });
+    } else if (params.sort === "price-desc") {
+      query = query.order("price", { ascending: false });
+    } else if (params.sort === "popular") {
+      query = query.order("sold_count", { ascending: false });
+    } else {
+      query = query.order("created_at", { ascending: false }); // newest
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data && data.length > 0 ? data : getLocalMockProducts(params);
+  } catch (err) {
+    console.error("Error fetching products, using mock fallback:", err);
+    return getLocalMockProducts(params);
+  }
+}
+
+function getLocalMockProducts(params: { category?: string; search?: string; sort?: string }): Product[] {
+  let list = [...MOCK_PRODUCTS];
+
+  if (params.category && params.category !== "all") {
+    list = list.filter((p) => p.category === params.category);
+  }
+
+  if (params.search) {
+    const s = params.search.toLowerCase();
+    list = list.filter((p) => p.name.toLowerCase().includes(s) || p.description.toLowerCase().includes(s));
+  }
+
+  if (params.sort === "price-asc") {
+    list.sort((a, b) => {
+      const aDisc = a.price * (1 - a.discount_percentage / 100);
+      const bDisc = b.price * (1 - b.discount_percentage / 100);
+      return aDisc - bDisc;
+    });
+  } else if (params.sort === "price-desc") {
+    list.sort((a, b) => {
+      const aDisc = a.price * (1 - a.discount_percentage / 100);
+      const bDisc = b.price * (1 - b.discount_percentage / 100);
+      return bDisc - aDisc;
+    });
+  } else if (params.sort === "popular") {
+    list.sort((a, b) => b.sold_count - a.sold_count);
+  } else {
+    list.sort((a, b) => b.created_at.localeCompare(a.created_at));
+  }
+
+  return list;
+}
+
+export default async function ShopPage({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const currentCategory = (params.category as string) || "all";
+  const currentSearch = (params.search as string) || "";
+  const currentSort = (params.sort as string) || "newest";
+  const focusSearch = params.focus === "search";
+
+  const products = await getProducts({
+    category: currentCategory,
+    search: currentSearch,
+    sort: currentSort,
+  });
+
+  return (
+    <main className="flex-grow max-w-container-max mx-auto w-full px-margin-mobile md:px-margin-desktop pt-12 pb-24 text-left">
+      {/* Page Header & Description */}
+      <div className="mb-12">
+        <h1 className="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-background mb-2">
+          Curated Collections
+        </h1>
+        <p className="font-body-lg text-body-lg text-secondary max-w-2xl">
+          Discover our handcrafted selections, designed to elevate your sleep experience with unparalleled materiality.
+        </p>
+      </div>
+
+      {/* Filter and Dropdowns (Client component) */}
+      <ShopFilters
+        currentCategory={currentCategory}
+        currentSearch={currentSearch}
+        currentSort={currentSort}
+        focusSearch={focusSearch}
+      />
+
+      {/* Product Grid */}
+      {products.length === 0 ? (
+        <div className="flex flex-col items-center justify-center text-center py-20 border border-dashed border-outline-variant/30 rounded-xl bg-white">
+          <HelpCircle className="h-16 w-16 text-secondary mb-4 stroke-[1.5]" />
+          <h3 className="font-serif text-h2 text-text-primary mb-2">No Collections Found</h3>
+          <p className="font-sans text-sm text-text-secondary max-w-[280px]">
+            Try adjusting your search criteria or select another collection tab.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-gutter gap-y-16">
+          {products.map((product, idx) => {
+            const displayPrice = product.price * (1 - product.discount_percentage / 100);
+            
+            // Re-create the product card mapping from design HTML
+            const productCardElement = (
+              <Link
+                key={product.id}
+                href={`/product/${product.id}`}
+                className="group product-card block text-left"
+              >
+                <div className="relative aspect-[4/5] bg-surface-container-low mb-6 overflow-hidden rounded-xl border border-outline-variant/20 shadow-xs parallax-zoom">
+                  <Image
+                    className="object-cover w-full h-full"
+                    alt={product.name}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 30vw"
+                    src={product.images[0] || "https://via.placeholder.com/400?text=Product"}
+                  />
+                  {product.discount_percentage > 0 && (
+                    <div className="absolute top-4 left-4 bg-surface/80 backdrop-blur-md px-3 py-1 border border-outline-variant/30 rounded font-label-caps text-label-caps text-on-background">
+                      SALE -{product.discount_percentage}%
+                    </div>
+                  )}
+                  {product.stock === 0 && (
+                    <div className="absolute inset-0 bg-black/30 backdrop-blur-xs flex items-center justify-center">
+                      <span className="bg-error text-white font-label-caps text-label-caps py-2 px-4 rounded-md">
+                        OUT OF STOCK
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <div className="flex justify-between items-start">
+                    <h3 className="font-headline-md text-headline-sm md:text-headline-md text-on-background text-lg group-hover:text-primary transition-colors duration-200">
+                      {product.name}
+                    </h3>
+                    <span className="font-body-md text-body-md text-on-background font-medium whitespace-nowrap">
+                      Rp {displayPrice.toLocaleString("id-ID")}
+                    </span>
+                  </div>
+                  <p className="font-body-md text-sm text-secondary">
+                    {product.material || "Luxe Bedding"} • {product.sizes[0] || "Standard"} • {product.colors[0] || "Standard"}
+                  </p>
+                  <p className="font-label-caps text-label-caps text-secondary pt-2">
+                    Motif: {product.category === "bedcover" ? "Solid Rumbai" : "Solid Calm"}
+                  </p>
+                </div>
+              </Link>
+            );
+
+            // Inject the premium Resort Collection promo banner block asymmetrically after the 3rd card
+            if (idx === 2) {
+              return [
+                productCardElement,
+                <div
+                  key="resort-collection-banner"
+                  className="group product-card block lg:col-span-2 text-left"
+                >
+                  <div className="relative aspect-[16/9] md:aspect-[8/5] bg-surface-container-low mb-6 overflow-hidden rounded-xl border border-outline-variant/20 shadow-xs">
+                    <Image
+                      className="object-cover w-full h-full"
+                      alt="The Resort Collection"
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 60vw"
+                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuDspoyrZ-C65kSNPrRIMje4Kriv53iQG5KC4G2y5qxKVqCbtSx_qrDz4KlWAPlgwReSBS-Q1f0fixbrbVTM1w9FgAFZY7FkdFW1HSSh1FtIJDfrrDtXQ9eHn-5HH3VwRFzL7mXWbIxdw6gLtX6fprfqTvAQ2RrdWLvCPnyQiTgcMyZEB_pzmHlPpEPXa960oyYYEF-NrJxP5uyUglZYLxR-fM1qGEAgSAfbXiZE-KP9SMz3oE1wuWlt"
+                    />
+                    <div className="absolute bottom-6 left-6 bg-surface/90 backdrop-blur-xl p-4 md:p-6 rounded-lg shadow-sm border border-outline-variant/30 max-w-xs text-left animate-scale-up">
+                      <h4 className="font-headline-md text-headline-md text-on-background mb-1">
+                        The Resort Collection
+                      </h4>
+                      <p className="font-body-md text-xs md:text-sm text-secondary mb-3">
+                        Experience five-star luxury every night in your master suite.
+                      </p>
+                      <Link
+                        href="/shop?category=bedcover"
+                        className="bg-primary-container text-on-primary-container px-4 py-2 font-label-caps text-label-caps hover:bg-primary hover:text-on-primary transition-colors duration-200 rounded inline-block text-xs uppercase"
+                      >
+                        Explore Set
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ];
+            }
+
+            return productCardElement;
+          })}
+        </div>
+      )}
+    </main>
+  );
+}
