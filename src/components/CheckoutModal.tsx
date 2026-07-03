@@ -48,13 +48,18 @@ export default function CheckoutModal() {
     if (!phone.trim()) return setError("Nomor WhatsApp wajib diisi");
     if (!address.trim()) return setError("Alamat pengiriman lengkap wajib diisi");
 
-    // Phone format sanitization (must start with 62 or 08)
+    // Validate email format if provided
+    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return setError("Format email tidak valid (cth: nama@email.com)");
+    }
+
+    // Phone format sanitization (support 08 -> 62 conversion, allow international length)
     let sanitizedPhone = phone.replace(/[^0-9]/g, "");
     if (sanitizedPhone.startsWith("0")) {
       sanitizedPhone = "62" + sanitizedPhone.slice(1);
     }
-    if (!sanitizedPhone.startsWith("62") || sanitizedPhone.length < 10) {
-      return setError("Nomor WhatsApp tidak valid. Gunakan format (cth: 08123456789)");
+    if (sanitizedPhone.length < 9 || sanitizedPhone.length > 15) {
+      return setError("Nomor WhatsApp tidak valid. Gunakan nomor dengan panjang 9-15 digit.");
     }
 
     setLoading(true);

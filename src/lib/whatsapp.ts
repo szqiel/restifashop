@@ -10,7 +10,8 @@ export function generateWhatsAppLink(
   customer: CustomerDetails,
   items: CartItem[],
   orderNumber: string,
-  totalPrice: number
+  totalPrice: number,
+  baseUrl?: string
 ): string {
   const phone = process.env.NEXT_PUBLIC_WHATSAPP_PHONE || "628777750028";
   
@@ -20,10 +21,17 @@ export function generateWhatsAppLink(
   message += `Alamat: ${customer.address}\n\n`;
   
   message += `*Detail Pesanan:*\n`;
-  items.forEach((item) => {
-    const lineTotal = item.price * item.quantity;
-    message += `- ${item.quantity}x ${item.name} (${item.colorSelected}, ${item.sizeSelected}) = Rp ${lineTotal.toLocaleString("id-ID")}\n`;
-  });
+  
+  if (items.length > 3 && baseUrl) {
+    const itemWord = items.length === 1 ? "item" : "items";
+    message += `- Terdiri dari ${items.length} ${itemWord} sprei/bedcover premium pilihan.\n`;
+    message += `Lihat detail pesanan lengkap di: ${baseUrl}/order-confirmation?orderNumber=${orderNumber}\n`;
+  } else {
+    items.forEach((item) => {
+      const lineTotal = item.price * item.quantity;
+      message += `- ${item.quantity}x ${item.name} (${item.colorSelected}, ${item.sizeSelected}) = Rp ${lineTotal.toLocaleString("id-ID")}\n`;
+    });
+  }
   
   message += `\n*Subtotal: Rp ${totalPrice.toLocaleString("id-ID")}*\n`;
   message += `(Ongkos kirim akan dikonfirmasi)\n\n`;

@@ -22,6 +22,53 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Dev mode fallback check
+    const isPlaceholder = !process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder-url");
+    if (isPlaceholder) {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, "0");
+      const dd = String(today.getDate()).padStart(2, "0");
+      const dateStr = `${yyyy}${mm}${dd}`;
+      const orderNumber = `ORD-${dateStr}-DEV`;
+
+      const subtotal = cart_items.reduce(
+        (sum: number, item: any) => sum + item.price_at_purchase * item.quantity,
+        0
+      );
+
+      const formattedCartItems: CartItem[] = cart_items.map((item: any) => ({
+        productId: item.product_id,
+        variantId: "",
+        name: item.product_name || "Sprei / Bedcover Item",
+        price: item.price_at_purchase,
+        quantity: item.quantity,
+        colorSelected: item.color_selected,
+        sizeSelected: item.size_selected,
+        image: "",
+      }));
+
+      const host = req.headers.get("host") || "localhost:3000";
+      const protocol = req.headers.get("x-forwarded-proto") || "http";
+      const baseUrl = `${protocol}://${host}`;
+
+      const whatsappLink = generateWhatsAppLink(
+        { name: customer_name, phone: customer_phone, address: customer_address },
+        formattedCartItems,
+        orderNumber,
+        subtotal,
+        baseUrl
+      );
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          order_number: orderNumber,
+          whatsapp_link: whatsappLink,
+        },
+      });
+    }
+
     // 2. Generate sequential order number (ORD-YYYYMMDD-SEQ)
     const today = new Date();
     const yyyy = today.getFullYear();
@@ -89,6 +136,23 @@ export async function POST(req: NextRequest) {
       throw new Error("Failed to insert order items: " + itemsError.message);
     }
 
+    // 5b. Update product stock levels
+    for (const item of cart_items) {
+      const { data: currentProduct, error: fetchStockError } = await supabase
+        .from("products")
+        .select("stock")
+        .eq("id", item.product_id)
+        .single();
+      
+      if (!fetchStockError && currentProduct) {
+        const currentStock = currentProduct.stock || 0;
+        await supabase
+          .from("products")
+          .update({ stock: Math.max(0, currentStock - item.quantity) })
+          .eq("id", item.product_id);
+      }
+    }
+
     // 6. Generate WhatsApp Link
     const formattedCartItems: CartItem[] = cart_items.map((item: any) => ({
       productId: item.product_id,
@@ -101,11 +165,16 @@ export async function POST(req: NextRequest) {
       image: "",
     }));
 
+    const host = req.headers.get("host") || "localhost:3000";
+    const protocol = req.headers.get("x-forwarded-proto") || "http";
+    const baseUrl = `${protocol}://${host}`;
+
     const whatsappLink = generateWhatsAppLink(
       { name: customer_name, phone: customer_phone, address: customer_address },
       formattedCartItems,
       orderNumber,
-      subtotal
+      subtotal,
+      baseUrl
     );
 
     // 7. Update order with generated whatsapp message payload (optional reference)

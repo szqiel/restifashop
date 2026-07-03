@@ -8,6 +8,12 @@ export async function middleware(request: NextRequest) {
     },
   });
 
+  const isPlaceholder = !process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder-url");
+  const isDev = process.env.NODE_ENV === "development";
+  if (isPlaceholder && isDev) {
+    return response;
+  }
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,

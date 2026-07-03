@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCartStore } from "@/store/useCartStore";
@@ -12,9 +12,20 @@ export default function Navbar() {
   const pathname = usePathname();
 
   const [mounted, setMounted] = useState(false);
-  useState(() => {
+  useEffect(() => {
     setMounted(true);
-  });
+
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === "cart-storage") {
+        useCartStore.persist.rehydrate();
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
 
   const cartCount = mounted ? getTotalItems() : 0;
 
