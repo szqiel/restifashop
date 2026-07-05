@@ -1033,6 +1033,18 @@ export default function AdminDashboardContent({
                 })()}
               </div>
             </div>
+
+            {/* Sticky Save Bar */}
+            <div className="fixed bottom-0 left-0 right-0 p-4 md:p-6 bg-surface/80 backdrop-blur-xl border-t border-outline-variant/30 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] z-40 flex justify-center md:justify-end animate-scale-up">
+              <button
+                onClick={handleSaveSettings}
+                disabled={savingSettings}
+                className="flex items-center gap-2 px-8 py-4 bg-on-surface text-surface font-sans font-bold text-xs uppercase tracking-widest rounded-full hover:bg-surface-tint transition-all shadow-xl cursor-pointer hover:-translate-y-1 active:translate-y-0"
+              >
+                <Save className="h-5 w-5" /> 
+                {savingSettings ? "Menyimpan..." : "Simpan Kustomisasi"}
+              </button>
+            </div>
           </>
         ) : null}
       </div>
