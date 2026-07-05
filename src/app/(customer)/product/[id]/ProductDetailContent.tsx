@@ -243,7 +243,6 @@ export default function ProductDetailContent({
               </div>
             </div>
           )}
-        </div>
 
         {/* Action Area */}
         <div className="flex flex-col gap-4 mt-4">
@@ -300,8 +299,9 @@ export default function ProductDetailContent({
           </details>
         </div>
       </div>
+    </div>
 
-      {/* Size Guide Modal */}
+    {/* Size Guide Modal */}
       {isSizeGuideOpen && (
         <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
           <div
