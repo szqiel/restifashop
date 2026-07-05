@@ -18,7 +18,7 @@ async function getLatestProducts(): Promise<Product[]> {
       .from("products")
       .select("*")
       .order("created_at", { ascending: false })
-      .range(0, 4); // top 5 products
+      .range(0, 7); // top 8 products
 
     if (error) throw error;
     return data && data.length > 0 ? data : [];

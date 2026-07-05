@@ -17,7 +17,7 @@ export default function HeroCarousel({ products }: HeroCarouselProps) {
     if (!products || products.length === 0) return;
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % products.length);
-    }, 5000);
+    }, 7000);
     return () => clearInterval(timer);
   }, [products]);
 
@@ -79,19 +79,36 @@ export default function HeroCarousel({ products }: HeroCarouselProps) {
       })}
 
       {/* Dots Indicator */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes progressFill {
+          from { width: 0%; }
+          to { width: 100%; }
+        }
+      `}} />
       <div className="absolute bottom-8 left-0 right-0 z-20 flex justify-center gap-3">
-        {products.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentIndex(index)}
-            className={`transition-all duration-300 rounded-full ${
-              index === currentIndex
-                ? "w-8 h-2.5 bg-primary shadow-sm"
-                : "w-2.5 h-2.5 bg-on-surface-variant/30 hover:bg-on-surface-variant/50"
-            }`}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
+        {products.map((_, index) => {
+          const isActive = index === currentIndex;
+          return (
+            <button
+              key={index}
+              onClick={() => setCurrentIndex(index)}
+              className={`relative overflow-hidden transition-all duration-300 rounded-full ${
+                isActive
+                  ? "w-12 h-2.5 bg-on-surface-variant/30 shadow-sm"
+                  : "w-2.5 h-2.5 bg-on-surface-variant/30 hover:bg-on-surface-variant/50"
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            >
+              {isActive && (
+                <div 
+                  key={currentIndex} /* Key forces re-render of animation when index changes */
+                  className="absolute top-0 left-0 h-full bg-primary"
+                  style={{ animation: "progressFill 7s linear forwards" }}
+                />
+              )}
+            </button>
+          );
+        })}
       </div>
     </section>
   );
