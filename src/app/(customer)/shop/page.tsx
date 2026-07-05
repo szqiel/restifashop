@@ -58,11 +58,27 @@ export default async function ShopPage({ searchParams }: PageProps) {
   const currentSort = (params.sort as string) || "newest";
   const focusSearch = params.focus === "search";
 
+  // 1. Fetch products
   const products = await getProducts({
     category: currentCategory,
     search: currentSearch,
     sort: currentSort,
   });
+
+  // 2. Fetch all unique categories dynamically
+  const { data: allProducts } = await supabase
+    .from("products")
+    .select("category");
+
+  const categoriesList = ["sprei", "bedcover", "selimut", "aksesoris"];
+  if (allProducts) {
+    allProducts.forEach((p) => {
+      const cat = p.category?.toLowerCase();
+      if (cat && !categoriesList.includes(cat)) {
+        categoriesList.push(cat);
+      }
+    });
+  }
 
   return (
     <main className="flex-grow max-w-container-max mx-auto w-full px-margin-mobile md:px-margin-desktop pt-12 pb-24 text-left">
@@ -82,6 +98,7 @@ export default async function ShopPage({ searchParams }: PageProps) {
         currentSearch={currentSearch}
         currentSort={currentSort}
         focusSearch={focusSearch}
+        categoriesList={categoriesList}
       />
 
       {/* Product Grid */}

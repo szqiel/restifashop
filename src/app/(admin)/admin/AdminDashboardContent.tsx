@@ -15,20 +15,31 @@ import {
   Save,
   Clipboard,
   Check,
+  Plus,
+  Trash2,
+  Image as ImageIcon,
+  Upload,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface AdminDashboardContentProps {
   initialOrders: any[];
+  initialProducts: any[];
 }
 
 export default function AdminDashboardContent({
   initialOrders,
+  initialProducts,
 }: AdminDashboardContentProps) {
   const router = useRouter();
   const supabase = createClient();
 
+  const [activeTab, setActiveTab] = useState<"orders" | "products">("orders");
   const [orders, setOrders] = useState(initialOrders);
+  const [products, setProducts] = useState(initialProducts);
+
+  // Orders filters
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
@@ -37,6 +48,25 @@ export default function AdminDashboardContent({
   const [notesText, setNotesText] = useState("");
   const [savingNotes, setSavingNotes] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // Products manager state
+  const [isAddProductOpen, setIsAddProductOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  // Add product form states
+  const [pName, setPName] = useState("");
+  const [pDesc, setPDesc] = useState("");
+  const [pCategory, setPCategory] = useState("sprei");
+  const [pCustomCategory, setPCustomCategory] = useState("");
+  const [pPrice, setPPrice] = useState("");
+  const [pDiscount, setPDiscount] = useState("0");
+  const [pStock, setPStock] = useState("10");
+  const [pColors, setPColors] = useState("");
+  const [pSizes, setPSizes] = useState("");
+  const [pMaterial, setPMaterial] = useState("");
+  const [pCare, setPCare] = useState("");
+  const [pImages, setPImages] = useState(""); // comma-separated URLs
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -59,7 +89,6 @@ export default function AdminDashboardContent({
         orders.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
       );
       
-      // Update selected order modal if open
       if (selectedOrder && selectedOrder.id === orderId) {
         setSelectedOrder({ ...selectedOrder, status: newStatus });
       }
@@ -96,7 +125,7 @@ export default function AdminDashboardContent({
     }
   };
 
-  // Copy order summary to clipboard for logistics/record-keeping
+  // Copy order summary to clipboard
   const handleCopyOrderText = () => {
     if (!selectedOrder) return;
 
@@ -162,7 +191,133 @@ export default function AdminDashboardContent({
     document.body.removeChild(link);
   };
 
-  // Filters logic
+  // Upload image to Supabase Storage
+  const handleUploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploadingImage(true);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("product-images")
+        .upload(filePath, file);
+
+      if (uploadError) {
+        throw new Error("Gagal mengunggah file. Silakan pastikan bucket 'product-images' sudah dibuat di Storage Supabase dengan akses 'public'.");
+      }
+
+      const { data } = supabase.storage
+        .from("product-images")
+        .getPublicUrl(filePath);
+
+      if (data?.publicUrl) {
+        const currentUrls = pImages.trim() ? pImages.split(",") : [];
+        setPImages([...currentUrls, data.publicUrl].join(","));
+        alert("Gambar berhasil diunggah!");
+      }
+    } catch (err: any) {
+      alert(err.message || "Gagal mengunggah gambar.");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  // Add product submit
+  const handleAddProductSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!pName.trim()) return alert("Nama produk wajib diisi");
+    if (!pPrice || parseFloat(pPrice) <= 0) return alert("Harga produk harus lebih dari 0");
+
+    const categoryToSave = pCategory === "custom" 
+      ? pCustomCategory.trim().toLowerCase() 
+      : pCategory.toLowerCase();
+
+    if (!categoryToSave) return alert("Kategori produk wajib ditentukan");
+
+    const colorsArray = pColors.split(",").map(c => c.trim()).filter(Boolean);
+    const sizesArray = pSizes.split(",").map(s => s.trim()).filter(Boolean);
+    const imagesArray = pImages.split(",").map(img => img.trim()).filter(Boolean);
+
+    if (imagesArray.length === 0) {
+      imagesArray.push("https://via.placeholder.com/600x800?text=No+Image");
+    }
+
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("products")
+        .insert([
+          {
+            name: pName.trim(),
+            description: pDesc.trim(),
+            price: parseFloat(pPrice),
+            discount_percentage: parseInt(pDiscount) || 0,
+            category: categoryToSave,
+            colors: colorsArray,
+            sizes: sizesArray,
+            images: imagesArray,
+            material: pMaterial.trim() || null,
+            care_instructions: pCare.trim() || null,
+            stock: parseInt(pStock) || 0,
+            sold_count: 0
+          }
+        ])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Update state locally
+      setProducts([data, ...products]);
+      setIsAddProductOpen(false);
+      
+      // Clear form
+      setPName("");
+      setPDesc("");
+      setPCategory("sprei");
+      setPCustomCategory("");
+      setPPrice("");
+      setPDiscount("0");
+      setPStock("10");
+      setPColors("");
+      setPSizes("");
+      setPImages("");
+      setPMaterial("");
+      setPCare("");
+
+      alert("Produk berhasil ditambahkan!");
+    } catch (err: any) {
+      alert("Gagal menambahkan produk: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Delete product
+  const handleDeleteProduct = async (id: string) => {
+    if (!confirm("Apakah Anda yakin ingin menghapus produk ini?")) return;
+
+    try {
+      const { error } = await supabase
+        .from("products")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+
+      setProducts(products.filter(p => p.id !== id));
+      alert("Produk berhasil dihapus!");
+    } catch (err: any) {
+      alert("Gagal menghapus produk: " + err.message);
+    }
+  };
+
+  // Orders filtering logic
   const filteredOrders = orders.filter((o) => {
     const matchesSearch =
       o.order_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -213,183 +368,334 @@ export default function AdminDashboardContent({
 
       {/* Main Admin Canvas */}
       <div className="flex-grow mx-auto w-full max-w-container-max px-margin-mobile md:px-margin-desktop py-10">
-        {/* Stat Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          {/* Card 1: Total Orders */}
-          <div className="bg-surface border border-outline-variant/40 rounded-xl p-6 shadow-2xs">
-            <span className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1">
-              Total Pesanan
-            </span>
-            <span className="font-serif text-3xl font-normal text-on-surface">
-              {totalOrdersCount}
-            </span>
-          </div>
-
-          {/* Card 2: Total Revenue */}
-          <div className="bg-surface border border-outline-variant/40 rounded-xl p-6 shadow-2xs">
-            <span className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1">
-              Total Pendapatan (Diluar Batal)
-            </span>
-            <span className="font-serif text-3xl font-normal text-on-surface">
-              Rp {totalRevenueSum.toLocaleString("id-ID")}
-            </span>
-          </div>
-
-          {/* Card 3: Pending Orders */}
-          <div className="bg-surface border border-outline-variant/40 rounded-xl p-6 shadow-2xs relative overflow-hidden">
-            <span className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1">
-              Pesanan Pending
-            </span>
-            <span className="font-serif text-3xl font-normal text-error">
-              {pendingOrdersCount}
-            </span>
-            {pendingOrdersCount > 0 && (
-              <span className="absolute top-4 right-4 flex h-2 w-2 rounded-full bg-error animate-ping" />
-            )}
-          </div>
+        
+        {/* Tab Selection Row */}
+        <div className="flex gap-4 border-b border-outline-variant/30 pb-4 mb-8">
+          <button
+            onClick={() => setActiveTab("orders")}
+            className={`px-5 py-2.5 font-sans font-bold text-xs uppercase tracking-widest rounded-full cursor-pointer transition-all border ${
+              activeTab === "orders"
+                ? "bg-on-surface text-surface border-on-surface"
+                : "bg-surface border-outline-variant text-on-surface-variant hover:border-on-surface"
+            }`}
+          >
+            Kelola Pesanan
+          </button>
+          <button
+            onClick={() => setActiveTab("products")}
+            className={`px-5 py-2.5 font-sans font-bold text-xs uppercase tracking-widest rounded-full cursor-pointer transition-all border ${
+              activeTab === "products"
+                ? "bg-on-surface text-surface border-on-surface"
+                : "bg-surface border-outline-variant text-on-surface-variant hover:border-on-surface"
+            }`}
+          >
+            Kelola Produk
+          </button>
         </div>
 
-        {/* Filters Toolbar */}
-        <div className="flex flex-col md:flex-row gap-4 justify-between items-center mb-6">
-          {/* Search bar */}
-          <div className="relative w-full md:max-w-xs">
-            <input
-              type="text"
-              placeholder="Cari order ID, nama..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 bg-surface border border-outline-variant/50 rounded-lg font-sans text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none transition-all shadow-3xs"
-            />
-            <Search className="absolute left-3 top-3.5 h-4 w-4 text-on-surface-variant/60" />
-          </div>
+        {activeTab === "orders" ? (
+          <>
+            {/* Stat Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+              {/* Card 1: Total Orders */}
+              <div className="bg-surface border border-outline-variant/40 rounded-xl p-6 shadow-2xs">
+                <span className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1">
+                  Total Pesanan
+                </span>
+                <span className="font-serif text-3xl font-normal text-on-surface">
+                  {totalOrdersCount}
+                </span>
+              </div>
 
-          {/* Export CSV & Categories */}
-          <div className="flex w-full md:w-auto gap-3 justify-end items-center">
-            <button
-              onClick={handleExportCSV}
-              className="flex items-center gap-1.5 px-4 py-2.5 bg-surface border border-outline-variant rounded-full font-sans text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 transition-all btn-tactile shadow-3xs cursor-pointer"
-            >
-              <Download className="h-4 w-4" /> Export CSV
-            </button>
-          </div>
-        </div>
+              {/* Card 2: Total Revenue */}
+              <div className="bg-surface border border-outline-variant/40 rounded-xl p-6 shadow-2xs">
+                <span className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1">
+                  Total Pendapatan (Diluar Batal)
+                </span>
+                <span className="font-serif text-3xl font-normal text-on-surface">
+                  Rp {totalRevenueSum.toLocaleString("id-ID")}
+                </span>
+              </div>
 
-        {/* Status filters */}
-        <div className="flex overflow-x-auto gap-2 pb-4 mb-6 border-b border-outline-variant/20 hide-scrollbar">
-          {[
-            { name: "Semua", id: "all" },
-            { name: "Pending", id: "pending" },
-            { name: "Dikonfirmasi", id: "confirmed" },
-            { name: "Dikirim", id: "shipped" },
-            { name: "Selesai", id: "completed" },
-            { name: "Dibatalkan", id: "cancelled" },
-          ].map((status) => (
-            <button
-              key={status.id}
-              onClick={() => setStatusFilter(status.id)}
-              className={`px-4 py-2 rounded-full font-sans text-[9px] font-bold uppercase tracking-widest transition-all btn-tactile border cursor-pointer ${
-                statusFilter === status.id
-                  ? "bg-on-surface text-surface border-on-surface"
-                  : "bg-surface border-outline-variant text-on-surface-variant hover:border-on-surface"
-              }`}
-            >
-              {status.name}
-            </button>
-          ))}
-        </div>
+              {/* Card 3: Pending Orders */}
+              <div className="bg-surface border border-outline-variant/40 rounded-xl p-6 shadow-2xs relative overflow-hidden">
+                <span className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1">
+                  Pesanan Pending
+                </span>
+                <span className="font-serif text-3xl font-normal text-error">
+                  {pendingOrdersCount}
+                </span>
+                {pendingOrdersCount > 0 && (
+                  <span className="absolute top-4 right-4 flex h-2 w-2 rounded-full bg-error animate-ping" />
+                )}
+              </div>
+            </div>
 
-        {/* Orders Table */}
-        <div className="bg-surface border border-outline-variant/40 rounded-xl shadow-xs overflow-x-auto">
-          <table className="w-full border-collapse text-left text-xs font-sans">
-            <thead>
-              <tr className="bg-surface border-b border-outline-variant/40 font-bold uppercase tracking-wider text-on-surface-variant/85">
-                <th className="py-4 px-6">ID Order</th>
-                <th className="py-4 px-6">Pelanggan</th>
-                <th className="py-4 px-6">Tanggal</th>
-                <th className="py-4 px-6 text-center">Status</th>
-                <th className="py-4 px-6 text-right">Total Belanja</th>
-                <th className="py-4 px-6 text-center">Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredOrders.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="py-12 text-center text-on-surface-variant/60 font-sans"
-                  >
-                    Tidak ada transaksi tercatat.
-                  </td>
-                </tr>
-              ) : (
-                filteredOrders.map((order) => (
-                  <tr
-                    key={order.id}
-                    className="border-b border-outline-variant/20 hover:bg-surface-variant/10 transition-all"
-                  >
-                    <td className="py-4 px-6 font-bold text-primary">
-                      {order.order_number}
-                    </td>
-                    <td className="py-4 px-6">
-                      <span className="block font-bold text-on-surface">
-                        {order.customer_name}
-                      </span>
-                      <span className="block text-[10px] text-on-surface-variant">
-                        {order.customer_phone}
-                      </span>
-                    </td>
-                    <td className="py-4 px-6 text-on-surface-variant">
-                      {new Date(order.created_at).toLocaleDateString("id-ID", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </td>
-                    <td className="py-4 px-6 text-center">
-                      <select
-                        value={order.status}
-                        onChange={(e) =>
-                          handleStatusChange(order.id, e.target.value)
-                        }
-                        className={`mx-auto block text-[9px] font-bold uppercase tracking-wider py-1.5 px-3 rounded-full border cursor-pointer focus:outline-none ${
-                          order.status === "completed"
-                            ? "bg-green-100/50 border-green-300/50 text-green-800"
-                            : order.status === "shipped"
-                            ? "bg-purple-100/50 border-purple-300/50 text-purple-850"
-                            : order.status === "confirmed"
-                            ? "bg-blue-100/50 border-blue-300/50 text-blue-800"
-                            : order.status === "cancelled"
-                            ? "bg-red-100/50 border-red-300/50 text-red-800"
-                            : "bg-amber-100/50 border-amber-300/50 text-amber-800"
-                        }`}
-                      >
-                        <option value="pending">Pending</option>
-                        <option value="confirmed">Dikonfirmasi</option>
-                        <option value="shipped">Dikirim</option>
-                        <option value="completed">Selesai</option>
-                        <option value="cancelled">Batal</option>
-                      </select>
-                    </td>
-                    <td className="py-4 px-6 text-right font-bold text-on-surface">
-                      Rp {order.subtotal.toLocaleString("id-ID")}
-                    </td>
-                    <td className="py-4 px-6 text-center">
-                      <button
-                        onClick={() => {
-                          setSelectedOrder(order);
-                          setNotesText(order.notes || "");
-                        }}
-                        className="p-2 text-on-surface hover:bg-surface-variant/30 rounded-md transition-colors btn-tactile cursor-pointer"
-                      >
-                        <Eye className="h-4.5 w-4.5" />
-                      </button>
-                    </td>
+            {/* Filters Toolbar */}
+            <div className="flex flex-col md:flex-row gap-4 justify-between items-center mb-6">
+              {/* Search bar */}
+              <div className="relative w-full md:max-w-xs">
+                <input
+                  type="text"
+                  placeholder="Cari order ID, nama..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2.5 bg-surface border border-outline-variant/50 rounded-lg font-sans text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none transition-all shadow-3xs"
+                />
+                <Search className="absolute left-3 top-3.5 h-4 w-4 text-on-surface-variant/60" />
+              </div>
+
+              {/* Export CSV Button */}
+              <div className="flex w-full md:w-auto gap-3 justify-end items-center">
+                <button
+                  onClick={handleExportCSV}
+                  className="flex items-center gap-1.5 px-4 py-2.5 bg-surface border border-outline-variant rounded-full font-sans text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 transition-all btn-tactile shadow-3xs cursor-pointer"
+                >
+                  <Download className="h-4 w-4" /> Export CSV
+                </button>
+              </div>
+            </div>
+
+            {/* Status filters */}
+            <div className="flex overflow-x-auto gap-2 pb-4 mb-6 border-b border-outline-variant/20 hide-scrollbar">
+              {[
+                { name: "Semua", id: "all" },
+                { name: "Pending", id: "pending" },
+                { name: "Dikonfirmasi", id: "confirmed" },
+                { name: "Dikirim", id: "shipped" },
+                { name: "Selesai", id: "completed" },
+                { name: "Dibatalkan", id: "cancelled" },
+              ].map((status) => (
+                <button
+                  key={status.id}
+                  onClick={() => setStatusFilter(status.id)}
+                  className={`px-4 py-2 rounded-full font-sans text-[9px] font-bold uppercase tracking-widest transition-all btn-tactile border cursor-pointer ${
+                    statusFilter === status.id
+                      ? "bg-on-surface text-surface border-on-surface"
+                      : "bg-surface border-outline-variant text-on-surface-variant hover:border-on-surface"
+                  }`}
+                >
+                  {status.name}
+                </button>
+              ))}
+            </div>
+
+            {/* Orders Table */}
+            <div className="bg-surface border border-outline-variant/40 rounded-xl shadow-xs overflow-x-auto">
+              <table className="w-full border-collapse text-left text-xs font-sans">
+                <thead>
+                  <tr className="bg-surface border-b border-outline-variant/40 font-bold uppercase tracking-wider text-on-surface-variant/85">
+                    <th className="py-4 px-6">ID Order</th>
+                    <th className="py-4 px-6">Pelanggan</th>
+                    <th className="py-4 px-6">Tanggal</th>
+                    <th className="py-4 px-6 text-center">Status</th>
+                    <th className="py-4 px-6 text-right">Total Belanja</th>
+                    <th className="py-4 px-6 text-center">Aksi</th>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                </thead>
+                <tbody>
+                  {filteredOrders.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={6}
+                        className="py-12 text-center text-on-surface-variant/60 font-sans"
+                      >
+                        Tidak ada transaksi tercatat.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredOrders.map((order) => (
+                      <tr
+                        key={order.id}
+                        className="border-b border-outline-variant/20 hover:bg-surface-variant/10 transition-all"
+                      >
+                        <td className="py-4 px-6 font-bold text-primary">
+                          {order.order_number}
+                        </td>
+                        <td className="py-4 px-6">
+                          <span className="block font-bold text-on-surface">
+                            {order.customer_name}
+                          </span>
+                          <span className="block text-[10px] text-on-surface-variant">
+                            {order.customer_phone}
+                          </span>
+                        </td>
+                        <td className="py-4 px-6 text-on-surface-variant">
+                          {new Date(order.created_at).toLocaleDateString("id-ID", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </td>
+                        <td className="py-4 px-6 text-center">
+                          <select
+                            value={order.status}
+                            onChange={(e) =>
+                              handleStatusChange(order.id, e.target.value)
+                            }
+                            className={`mx-auto block text-[9px] font-bold uppercase tracking-wider py-1.5 px-3 rounded-full border cursor-pointer focus:outline-none ${
+                              order.status === "completed"
+                                ? "bg-green-100/50 border-green-300/50 text-green-800"
+                                : order.status === "shipped"
+                                ? "bg-purple-100/50 border-purple-300/50 text-purple-800"
+                                : order.status === "confirmed"
+                                ? "bg-blue-100/50 border-blue-300/50 text-blue-800"
+                                : order.status === "cancelled"
+                                ? "bg-red-100/50 border-red-300/50 text-red-800"
+                                : "bg-amber-100/50 border-amber-300/50 text-amber-800"
+                            }`}
+                          >
+                            <option value="pending">Pending</option>
+                            <option value="confirmed">Dikonfirmasi</option>
+                            <option value="shipped">Dikirim</option>
+                            <option value="completed">Selesai</option>
+                            <option value="cancelled">Batal</option>
+                          </select>
+                        </td>
+                        <td className="py-4 px-6 text-right font-bold text-on-surface">
+                          Rp {order.subtotal.toLocaleString("id-ID")}
+                        </td>
+                        <td className="py-4 px-6 text-center">
+                          <button
+                            onClick={() => {
+                              setSelectedOrder(order);
+                              setNotesText(order.notes || "");
+                            }}
+                            className="p-2 text-on-surface hover:bg-surface-variant/30 rounded-md transition-colors btn-tactile cursor-pointer"
+                          >
+                            <Eye className="h-4.5 w-4.5" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Products Control Row */}
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="font-serif text-headline-md text-on-surface">
+                Daftar Produk ({products.length})
+              </h2>
+              <button
+                onClick={() => setIsAddProductOpen(true)}
+                className="flex items-center gap-1.5 px-5 py-2.5 bg-on-surface text-surface font-sans font-bold text-[10px] uppercase tracking-widest rounded-full hover:bg-surface-tint transition-all shadow-xs cursor-pointer"
+              >
+                <Plus className="h-4 w-4" /> Tambah Produk
+              </button>
+            </div>
+
+            {/* Products Management Table */}
+            <div className="bg-surface border border-outline-variant/40 rounded-xl shadow-xs overflow-x-auto">
+              <table className="w-full border-collapse text-left text-xs font-sans">
+                <thead>
+                  <tr className="bg-surface border-b border-outline-variant/40 font-bold uppercase tracking-wider text-on-surface-variant/85">
+                    <th className="py-4 px-6 w-16">Foto</th>
+                    <th className="py-4 px-6">Nama Produk</th>
+                    <th className="py-4 px-6">Kategori</th>
+                    <th className="py-4 px-6 text-right">Harga (IDR)</th>
+                    <th className="py-4 px-6 text-center">Stok</th>
+                    <th className="py-4 px-6 text-center">Terjual</th>
+                    <th className="py-4 px-6 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {products.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={7}
+                        className="py-12 text-center text-on-surface-variant/60 font-sans"
+                      >
+                        Tidak ada produk terdaftar. Silakan tambah produk baru.
+                      </td>
+                    </tr>
+                  ) : (
+                    products.map((product) => {
+                      const displayPrice =
+                        product.price * (1 - product.discount_percentage / 100);
+                      return (
+                        <tr
+                          key={product.id}
+                          className="border-b border-outline-variant/20 hover:bg-surface-variant/10 transition-all align-middle"
+                        >
+                          <td className="py-4 px-6">
+                            <div className="relative h-12 w-10 overflow-hidden rounded border border-outline-variant/40 bg-surface-dim">
+                              <Image
+                                src={
+                                  product.images?.[0] ||
+                                  "https://via.placeholder.com/400"
+                                }
+                                alt={product.name}
+                                fill
+                                className="object-cover"
+                                sizes="40px"
+                              />
+                            </div>
+                          </td>
+                          <td className="py-4 px-6">
+                            <span className="block font-bold text-on-surface text-sm">
+                              {product.name}
+                            </span>
+                            {product.discount_percentage > 0 && (
+                              <span className="inline-block mt-0.5 bg-red-100 text-red-800 text-[9px] font-bold px-1.5 py-0.5 rounded">
+                                SALE -{product.discount_percentage}%
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-4 px-6">
+                            <span className="inline-block bg-surface-variant/40 border border-outline-variant/30 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider text-on-surface-variant">
+                              {product.category}
+                            </span>
+                          </td>
+                          <td className="py-4 px-6 text-right font-semibold">
+                            {product.discount_percentage > 0 ? (
+                              <div>
+                                <span className="block text-on-surface">
+                                  Rp {displayPrice.toLocaleString("id-ID")}
+                                </span>
+                                <span className="block text-[10px] text-on-surface-variant/60 line-through mt-0.5">
+                                  Rp {product.price.toLocaleString("id-ID")}
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-on-surface">
+                                Rp {product.price.toLocaleString("id-ID")}
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-4 px-6 text-center font-bold">
+                            <span
+                              className={
+                                product.stock === 0 ? "text-error" : "text-on-surface"
+                              }
+                            >
+                              {product.stock}
+                            </span>
+                          </td>
+                          <td className="py-4 px-6 text-center text-on-surface-variant">
+                            {product.sold_count}
+                          </td>
+                          <td className="py-4 px-6 text-center">
+                            <button
+                              onClick={() => handleDeleteProduct(product.id)}
+                              className="p-2 text-error hover:bg-red-500/10 rounded-md transition-colors btn-tactile cursor-pointer"
+                              title="Hapus Produk"
+                            >
+                              <Trash2 className="h-4.5 w-4.5" />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Order Detail Modal */}
@@ -529,6 +835,254 @@ export default function AdminDashboardContent({
                 Selesai
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Product Modal */}
+      {isAddProductOpen && (
+        <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-300"
+            onClick={() => setIsAddProductOpen(false)}
+          />
+
+          <div className="relative z-10 w-full max-w-lg rounded-2xl bg-surface p-6 md:p-8 border border-outline-variant/30 shadow-xl animate-scale-up max-h-[90vh] overflow-y-auto hide-scrollbar text-left">
+            {/* Close */}
+            <button
+              onClick={() => setIsAddProductOpen(false)}
+              className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full hover:bg-surface-variant/40 text-on-surface-variant btn-tactile"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <span className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1">
+              Manajemen Produk
+            </span>
+            <h2 className="font-serif text-headline-lg text-on-surface mb-6">
+              Tambah Produk Baru
+            </h2>
+
+            <form onSubmit={handleAddProductSubmit} className="flex flex-col gap-5">
+              {/* Product Name */}
+              <div>
+                <label className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1.5">
+                  Nama Produk
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={pName}
+                  onChange={(e) => setPName(e.target.value)}
+                  placeholder="cth: Aurelian Signature Bedcover Set"
+                  className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 bg-surface font-sans text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none transition-all shadow-2xs"
+                />
+              </div>
+
+              {/* Category / Type & Custom Category Option */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1.5">
+                    Kategori / Tipe
+                  </label>
+                  <select
+                    value={pCategory}
+                    onChange={(e) => setPCategory(e.target.value)}
+                    className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 bg-surface font-sans text-xs text-on-surface focus:border-primary focus:outline-none transition-all shadow-2xs h-[38px] cursor-pointer"
+                  >
+                    <option value="sprei">Sprei</option>
+                    <option value="bedcover">Bedcover</option>
+                    <option value="selimut">Selimut</option>
+                    <option value="aksesoris">Aksesoris</option>
+                    <option value="custom">Kategori Baru...</option>
+                  </select>
+                </div>
+
+                {pCategory === "custom" && (
+                  <div>
+                    <label className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1.5">
+                      Nama Kategori Baru
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={pCustomCategory}
+                      onChange={(e) => setPCustomCategory(e.target.value)}
+                      placeholder="cth: Bantal"
+                      className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 bg-surface font-sans text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none transition-all shadow-2xs"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Price & Discount & Stock */}
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1.5">
+                    Harga (Rp)
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    value={pPrice}
+                    onChange={(e) => setPPrice(e.target.value)}
+                    placeholder="350000"
+                    className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 bg-surface font-sans text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none transition-all shadow-2xs"
+                  />
+                </div>
+                <div>
+                  <label className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1.5">
+                    Diskon (%)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={pDiscount}
+                    onChange={(e) => setPDiscount(e.target.value)}
+                    placeholder="10"
+                    className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 bg-surface font-sans text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none transition-all shadow-2xs"
+                  />
+                </div>
+                <div>
+                  <label className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1.5">
+                    Stok Awal
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={pStock}
+                    onChange={(e) => setPStock(e.target.value)}
+                    placeholder="10"
+                    className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 bg-surface font-sans text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none transition-all shadow-2xs"
+                  />
+                </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1.5">
+                  Deskripsi Produk
+                </label>
+                <textarea
+                  rows={2}
+                  value={pDesc}
+                  onChange={(e) => setPDesc(e.target.value)}
+                  placeholder="Deskripsi detail mengenai kelebihan produk..."
+                  className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 bg-surface font-sans text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none transition-all resize-none shadow-2xs"
+                />
+              </div>
+
+              {/* Colors & Sizes Options */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1.5">
+                    Pilihan Warna (Pisahkan dengan koma)
+                  </label>
+                  <input
+                    type="text"
+                    value={pColors}
+                    onChange={(e) => setPColors(e.target.value)}
+                    placeholder="Sage Green, Dusty Pink, Slate Grey"
+                    className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 bg-surface font-sans text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none transition-all shadow-2xs"
+                  />
+                </div>
+                <div>
+                  <label className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1.5">
+                    Pilihan Ukuran (Pisahkan dengan koma)
+                  </label>
+                  <input
+                    type="text"
+                    value={pSizes}
+                    onChange={(e) => setPSizes(e.target.value)}
+                    placeholder="Single, Queen, King, Extra King"
+                    className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 bg-surface font-sans text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none transition-all shadow-2xs"
+                  />
+                </div>
+              </div>
+
+              {/* Material & Care */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1.5">
+                    Bahan / Material
+                  </label>
+                  <input
+                    type="text"
+                    value={pMaterial}
+                    onChange={(e) => setPMaterial(e.target.value)}
+                    placeholder="cth: 100% Egyptian Cotton"
+                    className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 bg-surface font-sans text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none transition-all shadow-2xs"
+                  />
+                </div>
+                <div>
+                  <label className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1.5">
+                    Cara Perawatan
+                  </label>
+                  <input
+                    type="text"
+                    value={pCare}
+                    onChange={(e) => setPCare(e.target.value)}
+                    placeholder="cth: Jangan disetrika, gunakan air dingin"
+                    className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 bg-surface font-sans text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none transition-all shadow-2xs"
+                  />
+                </div>
+              </div>
+
+              {/* Image upload URLs and picker */}
+              <div>
+                <label className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1.5">
+                  Link Gambar Produk (Gunakan koma jika lebih dari satu)
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={pImages}
+                    onChange={(e) => setPImages(e.target.value)}
+                    placeholder="https://res.cloudinary.com/..., https://..."
+                    className="flex-grow border border-outline-variant/50 rounded-lg px-3 py-2 bg-surface font-sans text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none transition-all shadow-2xs"
+                  />
+                  <div className="relative">
+                    <input
+                      type="file"
+                      id="file-upload"
+                      accept="image/*"
+                      onChange={handleUploadImage}
+                      disabled={uploadingImage}
+                      className="hidden"
+                    />
+                    <label
+                      htmlFor="file-upload"
+                      className="flex h-9 px-4 items-center justify-center gap-1.5 bg-surface border border-outline-variant rounded-lg font-sans text-[10px] font-bold uppercase tracking-wider text-on-surface-variant hover:text-on-surface hover:border-on-surface cursor-pointer shadow-2xs transition-all duration-300"
+                    >
+                      <Upload className="h-4 w-4" />
+                      {uploadingImage ? "Upload..." : "Pilih File"}
+                    </label>
+                  </div>
+                </div>
+                <span className="block text-[9px] text-on-surface-variant/60 mt-1 font-sans">
+                  *Anda dapat mengunggah file langsung ke Storage Supabase atau memasukkan URL gambar web dari Google Photos/Cloudinary secara langsung.
+                </span>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3 border-t border-outline-variant/20 pt-4 mt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsAddProductOpen(false)}
+                  className="flex-grow py-3 bg-surface border border-outline-variant text-on-surface font-sans font-bold text-label rounded-full tracking-widest uppercase hover:bg-surface-variant/30 transition-all btn-tactile cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-grow py-3 bg-on-surface text-surface font-sans font-bold text-label rounded-full tracking-widest uppercase hover:bg-surface-tint transition-all btn-tactile cursor-pointer"
+                >
+                  {loading ? "Menyimpan..." : "Simpan Produk"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

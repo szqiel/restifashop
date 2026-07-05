@@ -6,8 +6,8 @@ export const dynamic = "force-dynamic";
 export default async function AdminDashboardPage() {
   const supabase = await createClient();
 
-  // Fetch orders with order items and related product names
-  const { data: orders, error } = await supabase
+  // 1. Fetch orders with order items and related product names
+  const { data: orders, error: ordersError } = await supabase
     .from("orders")
     .select(`
       *,
@@ -25,13 +25,26 @@ export default async function AdminDashboardPage() {
     `)
     .order("created_at", { ascending: false });
 
-  if (error) {
-    console.error("Error fetching admin orders:", error);
+  if (ordersError) {
+    console.error("Error fetching admin orders:", ordersError);
+  }
+
+  // 2. Fetch all products to manage in the product manager tab
+  const { data: products, error: productsError } = await supabase
+    .from("products")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (productsError) {
+    console.error("Error fetching admin products:", productsError);
   }
 
   return (
     <main className="flex-grow">
-      <AdminDashboardContent initialOrders={orders || []} />
+      <AdminDashboardContent 
+        initialOrders={orders || []} 
+        initialProducts={products || []} 
+      />
     </main>
   );
 }

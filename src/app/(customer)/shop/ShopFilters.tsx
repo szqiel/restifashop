@@ -9,6 +9,7 @@ interface ShopFiltersProps {
   currentSearch: string;
   currentSort: string;
   focusSearch: boolean;
+  categoriesList: string[];
 }
 
 export default function ShopFilters({
@@ -16,6 +17,7 @@ export default function ShopFilters({
   currentSearch,
   currentSort,
   focusSearch,
+  categoriesList,
 }: ShopFiltersProps) {
   const router = useRouter();
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -34,12 +36,13 @@ export default function ShopFilters({
     }
   }, [focusSearch]);
 
+  // Build categories array dynamically
   const categories = [
     { name: "Semua Koleksi", id: "all" },
-    { name: "Sprei", id: "sprei" },
-    { name: "Bedcover", id: "bedcover" },
-    { name: "Selimut", id: "selimut" },
-    { name: "Aksesoris", id: "aksesoris" },
+    ...categoriesList.map((cat) => ({
+      name: cat.charAt(0).toUpperCase() + cat.slice(1),
+      id: cat,
+    })),
   ];
 
   const sortOptions = [
