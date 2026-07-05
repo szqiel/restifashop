@@ -101,7 +101,7 @@ export default async function HomePage() {
                     sizes={col.type === "tall" ? "(max-width: 768px) 100vw, 30vw" : "(max-width: 768px) 100vw, 60vw"}
                     className="object-cover"
                     src={col.image}
-                  />
+                   quality={95} />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                   <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end text-left">
                     <div>
@@ -146,7 +146,7 @@ export default async function HomePage() {
                       sizes="(max-width: 768px) 100vw, 25vw"
                       className="object-cover"
                       src={product.images[0] || "/images/category-sprei.jpg"}
-                    />
+                     quality={95} />
                   </div>
                   <div className="flex flex-col mt-4 text-left">
                     <h4 className="font-body-lg text-body-lg text-on-surface mb-1 group-hover:text-primary transition-colors line-clamp-1">

@@ -148,7 +148,7 @@ export default async function ShopPage({ searchParams }: PageProps) {
                     fill
                     sizes="(max-width: 768px) 100vw, 30vw"
                     src={product.images[0] || "https://via.placeholder.com/400?text=Product"}
-                  />
+                   quality={95} />
                   {product.discount_percentage > 0 && (
                     <div className="absolute top-4 left-4 bg-surface/80 backdrop-blur-md px-3 py-1 border border-outline-variant/30 rounded font-label-caps text-label-caps text-on-background">
                       SALE -{product.discount_percentage}%
@@ -196,7 +196,7 @@ export default async function ShopPage({ searchParams }: PageProps) {
                       fill
                       sizes="(max-width: 1024px) 100vw, 60vw"
                       src={shopBanner.image}
-                    />
+                     quality={95} />
                     <div className="absolute bottom-6 left-6 bg-surface/90 backdrop-blur-xl p-4 md:p-6 rounded-lg shadow-sm border border-outline-variant/30 max-w-xs text-left animate-scale-up">
                       <h4 className="font-headline-md text-headline-md text-on-background mb-1">
                         {shopBanner.title}

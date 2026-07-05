@@ -120,7 +120,7 @@ export default function ProductDetailContent({
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 55vw"
               priority
-            />
+             quality={95} />
           </div>
           {product.images.length > 1 && (
             <div className="flex gap-4">
@@ -140,7 +140,7 @@ export default function ProductDetailContent({
                     fill
                     className="object-cover"
                     sizes="80px"
-                  />
+                   quality={95} />
                 </button>
               ))}
             </div>

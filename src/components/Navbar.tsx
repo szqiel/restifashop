@@ -65,7 +65,7 @@ export default function Navbar() {
               width={28}
               height={28}
               className="object-contain"
-            />
+             quality={95} />
             <span>Restifashop</span>
           </Link>
         </div>

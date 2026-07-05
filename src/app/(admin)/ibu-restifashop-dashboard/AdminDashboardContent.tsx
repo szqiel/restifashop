@@ -458,7 +458,7 @@ export default function AdminDashboardContent({
               width={26}
               height={26}
               className="object-contain"
-            />
+             quality={95} />
             <span>Restifashop</span>
             <span className="font-sans text-[9px] uppercase font-bold tracking-widest text-on-surface-variant/70 border border-outline-variant rounded-md px-2 py-0.5 ml-1">
               Dashboard
@@ -783,7 +783,7 @@ export default function AdminDashboardContent({
                                 fill
                                 className="object-cover"
                                 sizes="40px"
-                              />
+                               quality={95} />
                             </div>
                           </td>
                           <td className="py-4 px-6">

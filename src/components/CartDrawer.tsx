@@ -106,7 +106,7 @@ export default function CartDrawer() {
                       fill
                       sizes="80px"
                       className="object-cover"
-                    />
+                     quality={95} />
                   </div>
 
                   {/* Item Info */}
