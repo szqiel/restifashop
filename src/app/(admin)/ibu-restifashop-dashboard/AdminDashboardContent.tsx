@@ -66,6 +66,7 @@ export default function AdminDashboardContent({
   const [pSizes, setPSizes] = useState("");
   const [pMaterial, setPMaterial] = useState("");
   const [pCare, setPCare] = useState("");
+  const [pSizeGuide, setPSizeGuide] = useState("");
   const [pImages, setPImages] = useState(""); // comma-separated URLs
 
   const handleLogout = async () => {
@@ -263,6 +264,7 @@ export default function AdminDashboardContent({
             images: imagesArray,
             material: pMaterial.trim() || null,
             care_instructions: pCare.trim() || null,
+            size_guide: pSizeGuide.trim() || null,
             stock: parseInt(pStock) || 0,
             sold_count: 0
           }
@@ -289,6 +291,7 @@ export default function AdminDashboardContent({
       setPImages("");
       setPMaterial("");
       setPCare("");
+      setPSizeGuide("");
 
       alert("Produk berhasil ditambahkan!");
     } catch (err: any) {
@@ -1027,6 +1030,20 @@ export default function AdminDashboardContent({
                     className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 bg-surface font-sans text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none transition-all shadow-2xs"
                   />
                 </div>
+              </div>
+
+              {/* Size Guide Text Editor */}
+              <div>
+                <label className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1.5">
+                  Panduan Ukuran Khusus (Opsional)
+                </label>
+                <textarea
+                  rows={2}
+                  value={pSizeGuide}
+                  onChange={(e) => setPSizeGuide(e.target.value)}
+                  placeholder="cth:&#10;Single: 120 x 200 cm&#10;Queen: 160 x 200 cm&#10;King: 180 x 200 cm"
+                  className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 bg-surface font-sans text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none transition-all resize-none shadow-2xs"
+                />
               </div>
 
               {/* Image upload URLs and picker */}

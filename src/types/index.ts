@@ -10,6 +10,7 @@ export interface Product {
   images: string[];
   material: string;
   care_instructions: string;
+  size_guide?: string;
   stock: number;
   sold_count: number;
   created_at: string;

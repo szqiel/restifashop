@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS products (
   images JSONB DEFAULT '[]'::jsonb,
   material TEXT,
   care_instructions TEXT,
+  size_guide TEXT,
   stock INT DEFAULT 0,
   sold_count INT DEFAULT 0,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
