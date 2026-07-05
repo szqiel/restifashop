@@ -224,6 +224,40 @@ export default function AdminDashboardContent({
         setPImages([...currentUrls, data.publicUrl].join(","));
         alert("Gambar berhasil diunggah!");
       }
+      }
+    } catch (err: any) {
+      alert(err.message || "Gagal mengunggah gambar.");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleUploadSettingImage = async (e: React.ChangeEvent<HTMLInputElement>, callback: (url: string) => void) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploadingImage(true);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("product-images")
+        .upload(filePath, file);
+
+      if (uploadError) {
+        throw new Error("Gagal mengunggah file. Pastikan bucket 'product-images' publik.");
+      }
+
+      const { data } = supabase.storage
+        .from("product-images")
+        .getPublicUrl(filePath);
+
+      if (data?.publicUrl) {
+        callback(data.publicUrl);
+        alert("Gambar berhasil diunggah!");
+      }
     } catch (err: any) {
       alert(err.message || "Gagal mengunggah gambar.");
     } finally {
@@ -814,47 +848,172 @@ export default function AdminDashboardContent({
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <div>
-                  <label className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1.5">
-                    Data Koleksi Beranda (Advanced - JSON)
-                  </label>
-                  <textarea
-                    rows={6}
-                    value={typeof settings.home_collections === 'string' ? settings.home_collections : JSON.stringify(settings.home_collections || [], null, 2)}
-                    onChange={(e) => {
-                      try {
-                        const parsed = JSON.parse(e.target.value);
-                        setSettings({ ...settings, home_collections: parsed });
-                      } catch {
-                        // Allow typing invalid json temporarily
-                        setSettings({ ...settings, home_collections: e.target.value });
-                      }
-                    }}
-                    className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 bg-surface font-sans text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none transition-all resize-vertical shadow-2xs font-mono"
-                  />
-                  <span className="text-[9px] text-on-surface-variant/70 mt-1 block">Pastikan format JSON valid saat disimpan.</span>
+              </div>
+              
+              <div className="mt-8 border-t border-outline-variant/20 pt-6">
+                <h3 className="font-serif text-body-lg font-bold text-on-surface mb-4">
+                  Koleksi Beranda (3 Slot)
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {Array.from({ length: 3 }).map((_, idx) => {
+                    const defaultCols = [
+                      { title: "Bedcover", subtitle: "Koleksi", image: "", link: "/shop?category=bedcover", type: "large" },
+                      { title: "Sprei", subtitle: "Koleksi Utama", image: "", link: "/shop?category=sprei", type: "tall" },
+                      { title: "Selimut", subtitle: "Kenyamanan", image: "", link: "/shop?category=selimut", type: "standard" }
+                    ];
+                    const colData = (Array.isArray(settings.home_collections) && settings.home_collections[idx]) || defaultCols[idx];
+
+                    return (
+                      <div key={idx} className="bg-surface-bright p-4 rounded-xl border border-outline-variant/30 shadow-xs">
+                        <h4 className="font-sans font-bold text-xs uppercase text-on-surface mb-3">Slot {idx + 1}</h4>
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-[9px] font-bold text-on-surface-variant uppercase mb-1">Judul Utama</label>
+                            <input 
+                              type="text" 
+                              value={colData.title || ""} 
+                              onChange={(e) => {
+                                const newCols = Array.isArray(settings.home_collections) ? [...settings.home_collections] : defaultCols;
+                                newCols[idx] = { ...newCols[idx], title: e.target.value };
+                                setSettings({ ...settings, home_collections: newCols });
+                              }}
+                              className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 text-xs focus:border-primary outline-none"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[9px] font-bold text-on-surface-variant uppercase mb-1">Teks Kecil (Subtitle)</label>
+                            <input 
+                              type="text" 
+                              value={colData.subtitle || ""} 
+                              onChange={(e) => {
+                                const newCols = Array.isArray(settings.home_collections) ? [...settings.home_collections] : defaultCols;
+                                newCols[idx] = { ...newCols[idx], subtitle: e.target.value };
+                                setSettings({ ...settings, home_collections: newCols });
+                              }}
+                              className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 text-xs focus:border-primary outline-none"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[9px] font-bold text-on-surface-variant uppercase mb-1">Tujuan Link</label>
+                            <select 
+                              value={colData.link || ""} 
+                              onChange={(e) => {
+                                const newCols = Array.isArray(settings.home_collections) ? [...settings.home_collections] : defaultCols;
+                                newCols[idx] = { ...newCols[idx], link: e.target.value };
+                                setSettings({ ...settings, home_collections: newCols });
+                              }}
+                              className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 text-xs focus:border-primary outline-none"
+                            >
+                              <option value="/shop">Semua Koleksi (/shop)</option>
+                              <option value="/shop?category=bedcover">Bedcover (/shop?category=bedcover)</option>
+                              <option value="/shop?category=sprei">Sprei (/shop?category=sprei)</option>
+                              <option value="/shop?category=selimut">Selimut (/shop?category=selimut)</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-[9px] font-bold text-on-surface-variant uppercase mb-1">Gambar</label>
+                            <div className="flex gap-2">
+                              {colData.image && <img src={colData.image} alt="preview" className="h-9 w-9 object-cover rounded-md" />}
+                              <div className="relative flex-1">
+                                <input
+                                  type="file"
+                                  id={`file-col-${idx}`}
+                                  accept="image/*"
+                                  onChange={(e) => handleUploadSettingImage(e, (url) => {
+                                    const newCols = Array.isArray(settings.home_collections) ? [...settings.home_collections] : defaultCols;
+                                    newCols[idx] = { ...newCols[idx], image: url };
+                                    setSettings({ ...settings, home_collections: newCols });
+                                  })}
+                                  disabled={uploadingImage}
+                                  className="hidden"
+                                />
+                                <label
+                                  htmlFor={`file-col-${idx}`}
+                                  className="flex h-9 w-full items-center justify-center gap-1.5 bg-surface border border-outline-variant rounded-lg font-sans text-[10px] font-bold uppercase tracking-wider text-on-surface-variant hover:text-on-surface hover:border-on-surface cursor-pointer shadow-2xs transition-all"
+                                >
+                                  <Upload className="h-3 w-3" /> Upload
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-                <div>
-                  <label className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1.5">
-                    Banner Promo Shop (Advanced - JSON)
-                  </label>
-                  <textarea
-                    rows={6}
-                    value={typeof settings.shop_banner === 'string' ? settings.shop_banner : JSON.stringify(settings.shop_banner || {}, null, 2)}
-                    onChange={(e) => {
-                      try {
-                        const parsed = JSON.parse(e.target.value);
-                        setSettings({ ...settings, shop_banner: parsed });
-                      } catch {
-                        // Allow typing invalid json temporarily
-                        setSettings({ ...settings, shop_banner: e.target.value });
-                      }
-                    }}
-                    className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 bg-surface font-sans text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none transition-all resize-vertical shadow-2xs font-mono"
-                  />
-                  <span className="text-[9px] text-on-surface-variant/70 mt-1 block">Pastikan format JSON valid saat disimpan.</span>
-                </div>
+              </div>
+
+              <div className="mt-8 border-t border-outline-variant/20 pt-6">
+                <h3 className="font-serif text-body-lg font-bold text-on-surface mb-4">
+                  Banner Promo (Halaman Shop)
+                </h3>
+                
+                {(() => {
+                  const banner = settings.shop_banner || { title: "", description: "", link: "/shop?category=bedcover", image: "" };
+                  return (
+                    <div className="bg-surface-bright p-5 rounded-xl border border-outline-variant/30 shadow-xs max-w-2xl">
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-[9px] font-bold text-on-surface-variant uppercase mb-1">Judul Banner</label>
+                          <input 
+                            type="text" 
+                            value={banner.title || ""} 
+                            onChange={(e) => setSettings({ ...settings, shop_banner: { ...banner, title: e.target.value } })}
+                            className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 text-sm focus:border-primary outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] font-bold text-on-surface-variant uppercase mb-1">Deskripsi Pendek</label>
+                          <textarea 
+                            rows={2}
+                            value={banner.description || ""} 
+                            onChange={(e) => setSettings({ ...settings, shop_banner: { ...banner, description: e.target.value } })}
+                            className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 text-sm focus:border-primary outline-none resize-none"
+                          />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-[9px] font-bold text-on-surface-variant uppercase mb-1">Tujuan Link (Tombol)</label>
+                            <select 
+                              value={banner.link || ""} 
+                              onChange={(e) => setSettings({ ...settings, shop_banner: { ...banner, link: e.target.value } })}
+                              className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 text-sm focus:border-primary outline-none"
+                            >
+                              <option value="/shop">Semua Koleksi (/shop)</option>
+                              <option value="/shop?category=bedcover">Bedcover (/shop?category=bedcover)</option>
+                              <option value="/shop?category=sprei">Sprei (/shop?category=sprei)</option>
+                              <option value="/shop?category=selimut">Selimut (/shop?category=selimut)</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-[9px] font-bold text-on-surface-variant uppercase mb-1">Gambar Background</label>
+                            <div className="flex gap-2">
+                              {banner.image && <img src={banner.image} alt="preview" className="h-10 w-16 object-cover rounded-md" />}
+                              <div className="relative flex-1">
+                                <input
+                                  type="file"
+                                  id="file-banner"
+                                  accept="image/*"
+                                  onChange={(e) => handleUploadSettingImage(e, (url) => {
+                                    setSettings({ ...settings, shop_banner: { ...banner, image: url } });
+                                  })}
+                                  disabled={uploadingImage}
+                                  className="hidden"
+                                />
+                                <label
+                                  htmlFor="file-banner"
+                                  className="flex h-10 w-full items-center justify-center gap-1.5 bg-surface border border-outline-variant rounded-lg font-sans text-[10px] font-bold uppercase tracking-wider text-on-surface-variant hover:text-on-surface hover:border-on-surface cursor-pointer shadow-2xs transition-all"
+                                >
+                                  <Upload className="h-3 w-3" /> Upload
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           </>
