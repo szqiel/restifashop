@@ -45,10 +45,10 @@ export default async function HomePage() {
   return (
     <main className="flex-grow">
       {/* Hero Section (Asymmetric) */}
-      <section className="max-w-container-max mx-auto px-margin-mobile md:px-gutter pt-12 pb-section-gap">
+      <section className="max-w-container-max mx-auto px-margin-mobile md:px-gutter py-16 md:py-24">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter items-center">
           {/* Text Content (5 cols) */}
-          <div className="md:col-span-5 flex flex-col items-start space-y-6 z-10 md:pr-8 text-left">
+          <div className="md:col-span-5 flex flex-col justify-center items-start space-y-6 z-10 md:pr-8 text-left">
             <h1 className="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-surface leading-tight tracking-tighter">
               Artistry in Every Thread.
             </h1>
@@ -57,7 +57,7 @@ export default async function HomePage() {
             </p>
             <Link
               href="/shop"
-              className="inline-flex items-center justify-center bg-primary-container text-on-primary-container font-label-caps text-label-caps px-8 py-4 rounded-xl hover:scale-95 transition-all duration-300 shadow-[0_4px_14px_0_rgba(212,175,55,0.39)] uppercase tracking-wider relative overflow-hidden group"
+              className="inline-flex items-center justify-center bg-primary-container text-on-primary-container font-label-caps text-label-caps px-10 py-4 md:px-12 rounded-xl hover:scale-95 transition-all duration-300 shadow-[0_4px_14px_0_rgba(212,175,55,0.39)] uppercase tracking-widest relative overflow-hidden group"
             >
               <span className="relative z-10 flex items-center justify-center">
                 Beli Sekarang
@@ -81,9 +81,9 @@ export default async function HomePage() {
       </section>
 
       {/* Bento Grid Categories */}
-      <section className="bg-surface-bright py-section-gap border-t border-outline-variant/10">
+      <section className="bg-surface-bright py-16 md:py-24 border-t border-outline-variant/10">
         <div className="max-w-container-max mx-auto px-margin-mobile md:px-gutter">
-          <div className="flex justify-between items-end mb-12">
+          <div className="flex justify-between items-end mb-8">
             <h2 className="font-headline-md text-headline-md text-on-surface">Curated Essentials</h2>
             <Link
               href="/shop"
@@ -132,9 +132,9 @@ export default async function HomePage() {
       </section>
 
       {/* Featured New Arrivals */}
-      <section className="py-section-gap bg-surface border-t border-outline-variant/10">
+      <section className="py-16 md:py-24 bg-surface border-t border-outline-variant/10">
         <div className="max-w-container-max mx-auto px-margin-mobile md:px-gutter">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <h2 className="font-headline-md text-headline-md text-on-surface mb-4">New Arrivals</h2>
             <p className="font-body-md text-body-md text-on-surface-variant max-w-xl mx-auto">
               Temukan koleksi sprei dan bedcover terbaru kami, dirancang dengan ketelitian tinggi untuk menghadirkan kenyamanan tidur terbaik di kamar tidur Anda.
@@ -158,16 +158,14 @@ export default async function HomePage() {
                       src={product.images[0] || "/images/category-sprei.jpg"}
                     />
                   </div>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h4 className="font-body-lg text-body-lg text-on-surface mb-1 group-hover:text-primary transition-colors">
-                        {product.name}
-                      </h4>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant capitalize">
-                        {product.colors[0] || product.category}
-                      </p>
-                    </div>
-                    <span className="font-body-md text-body-md font-bold whitespace-nowrap">
+                  <div className="flex flex-col mt-4 text-left">
+                    <h4 className="font-body-lg text-body-lg text-on-surface mb-1 group-hover:text-primary transition-colors line-clamp-1">
+                      {product.name}
+                    </h4>
+                    <p className="font-body-sm text-body-sm text-on-surface-variant capitalize mb-2">
+                      {product.colors[0] || product.category}
+                    </p>
+                    <span className="font-body-md text-body-md font-bold text-on-surface">
                       Rp {displayPrice.toLocaleString("id-ID")}
                     </span>
                   </div>
