@@ -56,7 +56,7 @@ export default function AdminLoginPage() {
 
         // Refresh page and redirect to dashboard
         router.refresh();
-        router.push("/admin");
+        router.push("/ibu-restifashop-dashboard");
       }
     } catch (err: any) {
       setError(err.message || "Terjadi kesalahan sistem.");

@@ -43,7 +43,7 @@ export async function middleware(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
-  if (pathname.startsWith("/admin")) {
+  if (pathname.startsWith("/ibu-restifashop-dashboard")) {
     // 1. If not logged in and trying to access admin dashboard, redirect to login
     if (!user) {
       const url = request.nextUrl.clone();
@@ -56,7 +56,7 @@ export async function middleware(request: NextRequest) {
     // 2. If logged in and trying to access login page, redirect to dashboard
     if (user) {
       const url = request.nextUrl.clone();
-      url.pathname = "/admin";
+      url.pathname = "/ibu-restifashop-dashboard";
       return NextResponse.redirect(url);
     }
   }
@@ -65,5 +65,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/ibu-restifashop"],
+  matcher: ["/ibu-restifashop-dashboard/:path*", "/ibu-restifashop"],
 };

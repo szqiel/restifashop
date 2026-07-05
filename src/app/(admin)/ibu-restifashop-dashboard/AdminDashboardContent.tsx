@@ -341,7 +341,7 @@ export default function AdminDashboardContent({
       <header className="sticky top-0 z-navbar bg-surface/85 backdrop-blur-md border-b border-outline-variant/30 text-on-surface">
         <div className="mx-auto flex h-20 max-w-container-max items-center justify-between px-margin-mobile md:px-margin-desktop">
           <Link
-            href="/admin"
+            href="/ibu-restifashop-dashboard"
             className="font-serif text-headline-sm md:text-headline-md tracking-tight text-on-surface hover:opacity-85 transition-opacity flex items-center"
           >
             Restifashop{" "}
