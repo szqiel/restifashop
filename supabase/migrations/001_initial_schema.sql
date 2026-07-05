@@ -101,62 +101,51 @@ CREATE POLICY "Allow authenticated admins to view/update emails" ON emails
   FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
 -- 8. Seed sample bedding products
-INSERT INTO products (name, description, price, discount_percentage, category, colors, sizes, images, material, care_instructions, stock, sold_count)
+INSERT INTO products (id, name, description, price, discount_percentage, category, colors, sizes, images, material, care_instructions, stock, sold_count)
 VALUES
   (
+    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
     'Aurelian Signature Bedcover Set',
     'Set bedcover premium dengan detail rumbai tepi berbahan katun mesir 100%. Sangat lembut, sejuk, dan memberikan kenyamanan tidur kelas hotel bintang lima di kamar Anda.',
-    350000,
-    15,
+    1250000,
+    10,
     'bedcover',
-    '["Champagne Satin", "Soft Cream", "Linen Grey"]'::jsonb,
+    '["Champagne Gold", "Soft Cream", "Linen Grey"]'::jsonb,
     '["Queen", "King", "Extra King"]'::jsonb,
-    '["https://res.cloudinary.com/demo/image/upload/v1620000000/bedcover_champagne.jpg"]'::jsonb,
+    '["https://lh3.googleusercontent.com/aida-public/AB6AXuCrek7Dy8_zyxu3nxRwJe45p0oG3TFSzpglayS6e-CVhyfTsPjiXR6iX0XdCgEyr1aY1Wrwd3nmcCBylN1fcYhtsUWeQuY7IUNPaeqSoLq1yUHpg7L4JyLsGCT2wqXZP66B9ieH-kOQwSw8OnnDF27OXqGl64LXASLqT--s-aUu3i2uT2R6DaT8hFrlhzFAOOzns3lIQyEl_4Q613Uy4s5YxPdDa7uNpq30EJLOnHEly-62fwYh22va"]'::jsonb,
     '100% Egyptian Cotton',
     'Cuci dengan detergen cair lembut, jangan gunakan pemutih, setrika suhu sedang jika diperlukan.',
     25,
     142
   ),
   (
-    'Luxe Sprei Katun Premium',
-    'Sprei katun premium jacquard dengan motif minimalis modern. Memiliki ketebalan yang pas dan sejuk digunakan sepanjang malam.',
-    184000,
-    10,
+    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12',
+    'Signature Linen Sprei Set',
+    'Sprei linen premium jacquard dengan motif minimalis modern. Memiliki ketebalan yang pas dan sejuk digunakan sepanjang malam.',
+    850000,
+    0,
     'sprei',
-    '["Sage Green", "Dusty Pink", "Chalk White"]'::jsonb,
-    '["Single", "Double", "Queen", "King"]'::jsonb,
-    '["https://res.cloudinary.com/demo/image/upload/v1620000000/sprei_sage.jpg"]'::jsonb,
+    '["Pure White", "Sage Green", "Charcoal Grey"]'::jsonb,
+    '["Single", "Queen", "King"]'::jsonb,
+    '["https://lh3.googleusercontent.com/aida-public/AB6AXuD0lizvIe2RxGvzVSlHZg5GpfdxBcQFfH8P97TUlTZSmKrgOezV5GU13V4y3I7JjMQj5Zu2mAx_SxK3k8m0lIHEGPcSNJnFYMc1B7UXVdgh5paiu93IM1I1Or64iKaMEQYqVxvkw89x-uc7t2BwFkG7j3pi3Z1TfzWKqiUW-xJNYxF5Tw6FJqaXU69xxgBZ7dxbXbRdsLMWrwcKE_gaJU1bMcEeIBpGyegWUwG2S8pVxozsghDIaLlK"]'::jsonb,
     '100% Cotton Jacquard',
     'Cuci terpisah saat pencucian pertama, jemur di tempat teduh terhindar dari matahari langsung.',
     40,
     285
   ),
   (
-    'Serene Selimut Bulu Halus',
+    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13',
+    'Serene Flannel Selimut',
     'Selimut bulu flannel super halus yang ringan namun hangat. Cocok untuk menemani tidur Anda di ruangan ber-AC.',
-    120000,
-    5,
+    650000,
+    15,
     'selimut',
     '["Taupe", "Sage Green", "Linen Grey"]'::jsonb,
     '["Single", "Double"]'::jsonb,
-    '["https://res.cloudinary.com/demo/image/upload/v1620000000/selimut_grey.jpg"]'::jsonb,
+    '["https://lh3.googleusercontent.com/aida-public/AB6AXuDabY6pXY4s7d_2CPda7FFq1wb3IJmApt5hU-7Nr_NMjmLVyHar69sOHR0X0QarjSbQVDSu9m1ANU3DmpYTvRNg1xmjZ-86C-HcWg6IelhV3kU6Xpr6MK8AevcjazjldMFNAnrAdl9rdiRwQRjZrtzSSrBQAsy-2--k58KK7TYfg-4nCFWZftns6w6IS3e5T2WCB9kXGCR8h8j9Qf1k5ACFFPXhs31DAclD42erpJLZWX2M9rMB5td3"]'::jsonb,
     'Microfiber Flannel',
     'Cuci menggunakan mesin cuci mode lembut, jangan disetrika.',
     15,
     88
-  ),
-  (
-    'Bantal Microgel Bulu Angsa Sintetis',
-    'Bantal tidur dengan isi microgel serat halus pengganti bulu angsa. Sangat empuk, hipoalergenik, dan menopang leher dengan sempurna.',
-    85000,
-    0,
-    'aksesoris',
-    '["White Only"]'::jsonb,
-    '["Standard Size"]'::jsonb,
-    '["https://res.cloudinary.com/demo/image/upload/v1620000000/bantal_white.jpg"]'::jsonb,
-    'Microgel & Cotton Cover',
-    'Bisa dicuci kering (dry clean) atau tepuk-tepuk secara berkala agar kembali mengembang.',
-    50,
-    340
   )
-ON CONFLICT DO NOTHING;
+ON CONFLICT (id) DO NOTHING;
