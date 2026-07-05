@@ -45,11 +45,14 @@ export default function HeroCarousel({ products }: HeroCarouselProps) {
               />
             </div>
 
-            {/* Light/Gold Gradient Overlay - Shortened and moved to bottom */}
-            <div className="absolute inset-x-0 bottom-0 h-1/4 md:h-1/5 bg-gradient-to-t from-surface via-surface/90 to-transparent"></div>
+            {/* IDLIX-Style Left Gradient for Text Readability */}
+            <div className="absolute inset-0 w-full md:w-3/4 bg-gradient-to-r from-surface via-surface/95 to-transparent"></div>
+            
+            {/* Subtle Bottom Gradient to blend with next section */}
+            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-surface to-transparent"></div>
 
             {/* Content */}
-            <div className="absolute inset-0 max-w-container-max mx-auto px-margin-mobile md:px-gutter flex flex-col justify-end items-start text-left pb-24 md:pb-32">
+            <div className="absolute inset-0 max-w-container-max mx-auto px-margin-mobile md:px-gutter flex flex-col justify-center items-start text-left z-10">
               <div className="md:w-1/2 space-y-6">
                 <div className="inline-block px-3 py-1 bg-primary/10 border border-primary/20 rounded-full font-sans font-bold text-[10px] uppercase tracking-widest text-primary mb-2">
                   Koleksi Terbaru
