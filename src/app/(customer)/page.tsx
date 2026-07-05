@@ -3,14 +3,13 @@ import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { Product } from "@/types";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
-import { MOCK_PRODUCTS } from "@/lib/mockData";
 
 // Server-side fetching for home page products
 async function getFeaturedProducts(): Promise<Product[]> {
   try {
     const isPlaceholder = !process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder-url");
     if (isPlaceholder) {
-      return MOCK_PRODUCTS;
+      return [];
     }
     const { data, error } = await supabase
       .from("products")
@@ -19,10 +18,10 @@ async function getFeaturedProducts(): Promise<Product[]> {
       .range(0, 3); // top 4 products
 
     if (error) throw error;
-    return data && data.length > 0 ? data : MOCK_PRODUCTS;
+    return data && data.length > 0 ? data : [];
   } catch (err) {
-    console.error("Error fetching featured products, using mock fallback:", err);
-    return MOCK_PRODUCTS;
+    console.error("Error fetching featured products:", err);
+    return [];
   }
 }
 

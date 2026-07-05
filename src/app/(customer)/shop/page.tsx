@@ -4,7 +4,6 @@ import { supabase } from "@/lib/supabase";
 import { Product } from "@/types";
 import { HelpCircle } from "lucide-react";
 import ShopFilters from "./ShopFilters";
-import { MOCK_PRODUCTS } from "@/lib/mockData";
 
 interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -18,7 +17,7 @@ async function getProducts(params: {
   try {
     const isPlaceholder = !process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder-url");
     if (isPlaceholder) {
-      return getLocalMockProducts(params);
+      return [];
     }
     let query = supabase.from("products").select("*");
 
@@ -43,44 +42,11 @@ async function getProducts(params: {
 
     const { data, error } = await query;
     if (error) throw error;
-    return data && data.length > 0 ? data : getLocalMockProducts(params);
+    return data && data.length > 0 ? data : [];
   } catch (err) {
-    console.error("Error fetching products, using mock fallback:", err);
-    return getLocalMockProducts(params);
+    console.error("Error fetching products:", err);
+    return [];
   }
-}
-
-function getLocalMockProducts(params: { category?: string; search?: string; sort?: string }): Product[] {
-  let list = [...MOCK_PRODUCTS];
-
-  if (params.category && params.category !== "all") {
-    list = list.filter((p) => p.category === params.category);
-  }
-
-  if (params.search) {
-    const s = params.search.toLowerCase();
-    list = list.filter((p) => p.name.toLowerCase().includes(s) || p.description.toLowerCase().includes(s));
-  }
-
-  if (params.sort === "price-asc") {
-    list.sort((a, b) => {
-      const aDisc = a.price * (1 - a.discount_percentage / 100);
-      const bDisc = b.price * (1 - b.discount_percentage / 100);
-      return aDisc - bDisc;
-    });
-  } else if (params.sort === "price-desc") {
-    list.sort((a, b) => {
-      const aDisc = a.price * (1 - a.discount_percentage / 100);
-      const bDisc = b.price * (1 - b.discount_percentage / 100);
-      return bDisc - aDisc;
-    });
-  } else if (params.sort === "popular") {
-    list.sort((a, b) => b.sold_count - a.sold_count);
-  } else {
-    list.sort((a, b) => b.created_at.localeCompare(a.created_at));
-  }
-
-  return list;
 }
 
 export default async function ShopPage({ searchParams }: PageProps) {
