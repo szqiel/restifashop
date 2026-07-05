@@ -5,6 +5,8 @@ import { Product } from "@/types";
 import { HelpCircle } from "lucide-react";
 import ShopFilters from "./ShopFilters";
 
+export const revalidate = 60;
+
 interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }

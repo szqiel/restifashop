@@ -4,6 +4,8 @@ import { supabase } from "@/lib/supabase";
 import { Product } from "@/types";
 import ProductDetailContent from "./ProductDetailContent";
 
+export const revalidate = 60;
+
 interface PageProps {
   params: Promise<{ id: string }>;
 }

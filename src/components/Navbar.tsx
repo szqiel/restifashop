@@ -92,13 +92,7 @@ export default function Navbar() {
             <Search className="h-6 w-6 stroke-[1.5]" />
           </Link>
 
-          {/* Admin Dashboard */}
-          <Link
-            href="/admin"
-            className="p-2 hover:opacity-80 transition-opacity active:scale-95 duration-150 flex items-center justify-center"
-          >
-            <User className="h-6 w-6 stroke-[1.5]" />
-          </Link>
+
 
           {/* Shopping Bag */}
           <button

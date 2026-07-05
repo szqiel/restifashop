@@ -45,14 +45,16 @@ export async function middleware(request: NextRequest) {
 
   if (pathname.startsWith("/admin")) {
     // 1. If not logged in and trying to access admin dashboard, redirect to login
-    if (!user && pathname !== "/admin/login") {
+    if (!user) {
       const url = request.nextUrl.clone();
-      url.pathname = "/admin/login";
+      url.pathname = "/ibu-restifashop";
       return NextResponse.redirect(url);
     }
+  }
 
+  if (pathname === "/ibu-restifashop") {
     // 2. If logged in and trying to access login page, redirect to dashboard
-    if (user && pathname === "/admin/login") {
+    if (user) {
       const url = request.nextUrl.clone();
       url.pathname = "/admin";
       return NextResponse.redirect(url);
@@ -63,5 +65,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/ibu-restifashop"],
 };
