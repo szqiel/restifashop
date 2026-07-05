@@ -921,10 +921,10 @@ export default function AdminDashboardContent({
                               }}
                               className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 text-xs focus:border-primary outline-none"
                             >
-                              <option value="/shop">Semua Koleksi (/shop)</option>
-                              <option value="/shop?category=bedcover">Bedcover (/shop?category=bedcover)</option>
-                              <option value="/shop?category=sprei">Sprei (/shop?category=sprei)</option>
-                              <option value="/shop?category=selimut">Selimut (/shop?category=selimut)</option>
+                              <option value="/shop">Semua Koleksi</option>
+                              <option value="/shop?category=bedcover">Bedcover</option>
+                              <option value="/shop?category=sprei">Sprei</option>
+                              <option value="/shop?category=selimut">Selimut</option>
                             </select>
                           </div>
                           <div>
@@ -996,10 +996,10 @@ export default function AdminDashboardContent({
                               onChange={(e) => setSettings({ ...settings, shop_banner: { ...banner, link: e.target.value } })}
                               className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 text-sm focus:border-primary outline-none"
                             >
-                              <option value="/shop">Semua Koleksi (/shop)</option>
-                              <option value="/shop?category=bedcover">Bedcover (/shop?category=bedcover)</option>
-                              <option value="/shop?category=sprei">Sprei (/shop?category=sprei)</option>
-                              <option value="/shop?category=selimut">Selimut (/shop?category=selimut)</option>
+                              <option value="/shop">Semua Koleksi</option>
+                              <option value="/shop?category=bedcover">Bedcover</option>
+                              <option value="/shop?category=sprei">Sprei</option>
+                              <option value="/shop?category=selimut">Selimut</option>
                             </select>
                           </div>
                           <div>
