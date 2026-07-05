@@ -52,14 +52,14 @@ export default async function HomePage() {
             </Link>
           </div>
           {/* Image Content (7 cols) */}
-          <div className="md:col-span-7 relative h-[400px] md:h-[650px] w-full rounded-2xl overflow-hidden mt-8 md:mt-0 parallax-zoom group border border-white/10 shadow-lg">
+          <div className="md:col-span-7 relative h-[400px] md:h-[650px] w-full rounded-2xl overflow-hidden mt-8 md:mt-0 parallax-zoom group shadow-xl">
             <Image
               alt="Premium Bedding"
               fill
               priority
               sizes="(max-width: 768px) 100vw, 60vw"
               className="object-cover"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwGKhUmsxoYtUWLCedcnz5tALl0XzFQySY6D1deIzJ5EojtjN4djAH0SHOlMMxQPA713UGU4uu9Y9eo2lqr4hmVAGYAEtQf2YdOIL1W3iZot10Z0wqwHGIGqAzBeYI4PxWBebq-8xxkMmmTmu5sBgwzMvCkMqYUSqH3enYi78KFiPeZpBR3NWy9xoqjo6_a2L_rSmAiomPkt9cr_u_g6utLUQqJ2qED5ea_V8DWQkZG4wOPL1RNtrO"
+              src="/images/hero-bedding.jpg"
             />
           </div>
         </div>
@@ -88,10 +88,9 @@ export default async function HomePage() {
                 fill
                 sizes="(max-width: 768px) 100vw, 60vw"
                 className="object-cover"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrek7Dy8_zyxu3nxRwJe45p0oG3TFSzpglayS6e-CVhyfTsPjiXR6iX0XdCgEyr1aY1Wrwd3nmcCBylN1fcYhtsUWeQuY7IUNPaeqSoLq1yUHpg7L4JyLsGCT2wqXZP66B9ieH-kOQwSw8OnnDF27OXqGl64LXASLqT--s-aUu3i2uT2R6DaT8hFrlhzFAOOzns3lIQyEl_4Q613Uy4s5YxPdDa7uNpq30EJLOnHEly-62fwYh22va"
+                src="/images/category-bedcover.jpg"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-              <div className="absolute inset-0 border border-white/10 rounded-xl pointer-events-none" />
               <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end text-left">
                 <div>
                   <span className="font-label-caps text-label-caps text-white/80 block mb-2 uppercase tracking-wider">
@@ -115,10 +114,9 @@ export default async function HomePage() {
                 fill
                 sizes="(max-width: 768px) 100vw, 30vw"
                 className="object-cover"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0lizvIe2RxGvzVSlHZg5GpfdxBcQFfH8P97TUlTZSmKrgOezV5GU13V4y3I7JjMQj5Zu2mAx_SxK3k8m0lIHEGPcSNJnFYMc1B7UXVdgh5paiu93IM1I1Or64iKaMEQYqVxvkw89x-uc7t2BwFkG7j3pi3Z1TfzWKqiUW-xJNYxF5Tw6FJqaXU69xxgBZ7dxbXbRdsLMWrwcKE_gaJU1bMcEeIBpGyegWUwG2S8pVxozsghDIaLlK"
+                src="/images/category-sprei.jpg"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-              <div className="absolute inset-0 border border-white/10 rounded-xl pointer-events-none" />
               <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end text-left">
                 <div>
                   <span className="font-label-caps text-label-caps text-white/80 block mb-2 uppercase tracking-wider">
@@ -142,10 +140,9 @@ export default async function HomePage() {
                 fill
                 sizes="(max-width: 768px) 100vw, 60vw"
                 className="object-cover"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDabY6pXY4s7d_2CPda7FFq1wb3IJmApt5hU-7Nr_NMjmLVyHar69sOHR0X0QarjSbQVDSu9m1ANU3DmpYTvRNg1xmjZ-86C-HcWg6IelhV3kU6Xpr6MK8AevcjazjldMFNAnrAdl9rdiRwQRjZrtzSSrBQAsy-2--k58KK7TYfg-4nCFWZftns6w6IS3e5T2WCB9kXGCR8h8j9Qf1k5ACFFPXhs31DAclD42erpJLZWX2M9rMB5td3"
+                src="/images/category-selimut.jpg"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-              <div className="absolute inset-0 border border-white/10 rounded-xl pointer-events-none" />
               <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end text-left">
                 <div>
                   <span className="font-label-caps text-label-caps text-white/80 block mb-2 uppercase tracking-wider">
@@ -180,13 +177,13 @@ export default async function HomePage() {
                   href={`/product/${product.id}`}
                   className="group cursor-pointer block text-left"
                 >
-                  <div className="relative w-full aspect-[4/5] rounded-xl overflow-hidden bg-surface-dim mb-4 parallax-zoom border border-outline-variant/20 shadow-xs">
+                  <div className="relative w-full aspect-[4/5] rounded-xl overflow-hidden bg-surface-dim mb-4 parallax-zoom shadow-md hover:shadow-xl transition-shadow duration-300">
                     <Image
                       alt={product.name}
                       fill
                       sizes="(max-width: 768px) 100vw, 25vw"
                       className="object-cover"
-                      src={product.images[0] || "https://via.placeholder.com/400?text=Product"}
+                      src={product.images[0] || "/images/category-sprei.jpg"}
                     />
                   </div>
                   <div className="flex justify-between items-start">

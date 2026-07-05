@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useCartStore } from "@/store/useCartStore";
-import { Search, ShoppingBag, User, Menu, X } from "lucide-react";
+import { Search, ShoppingBag, Menu, X } from "lucide-react";
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -38,7 +38,7 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="bg-surface dark:bg-surface-container-low docked full-width top-0 z-50 border-b border-outline-variant/30 flat no shadows sticky transition-all duration-300">
+    <header className="sticky top-0 z-50 w-full border-b border-outline-variant/30 bg-surface/95 backdrop-blur-md transition-all duration-300">
       <div className="flex justify-between items-center px-margin-mobile md:px-margin-desktop py-unit w-full max-w-container-max mx-auto h-24 relative">
         {/* Mobile menu and Brand Logo left-aligned */}
         <div className="flex items-center gap-2">
