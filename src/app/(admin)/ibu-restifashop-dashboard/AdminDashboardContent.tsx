@@ -17,6 +17,7 @@ import {
   Check,
   Plus,
   Trash2,
+  Edit,
   Image as ImageIcon,
   Upload,
 } from "lucide-react";
@@ -64,6 +65,7 @@ export default function AdminDashboardContent({
 
   // Products manager state
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
 
@@ -306,50 +308,46 @@ export default function AdminDashboardContent({
 
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("products")
-        .insert([
-          {
-            name: pName.trim(),
-            description: pDesc.trim(),
-            price: parseFloat(pPrice),
-            discount_percentage: parseInt(pDiscount) || 0,
-            category: categoryToSave,
-            colors: colorsArray,
-            sizes: sizesArray,
-            images: imagesArray,
-            material: pMaterial.trim() || null,
-            care_instructions: pCare.trim() || null,
-            size_guide: pSizeGuide.trim() || null,
-            stock: parseInt(pStock) || 0,
-            sold_count: 0
-          }
-        ])
-        .select()
-        .single();
+      const productData = {
+        name: pName.trim(),
+        description: pDesc.trim(),
+        price: parseFloat(pPrice),
+        discount_percentage: parseInt(pDiscount) || 0,
+        category: categoryToSave,
+        colors: colorsArray,
+        sizes: sizesArray,
+        images: imagesArray,
+        material: pMaterial.trim() || null,
+        care_instructions: pCare.trim() || null,
+        size_guide: pSizeGuide.trim() || null,
+        stock: parseInt(pStock) || 0,
+      };
 
-      if (error) throw error;
+      if (editingProductId) {
+        const { data, error } = await supabase
+          .from("products")
+          .update(productData)
+          .eq("id", editingProductId)
+          .select()
+          .single();
 
-      // Update state locally
-      setProducts([data, ...products]);
+        if (error) throw error;
+        setProducts(products.map(p => p.id === editingProductId ? data : p));
+        showToast("Produk berhasil diperbarui!");
+      } else {
+        const { data, error } = await supabase
+          .from("products")
+          .insert([{ ...productData, sold_count: 0 }])
+          .select()
+          .single();
+
+        if (error) throw error;
+        setProducts([data, ...products]);
+        showToast("Produk berhasil ditambahkan!");
+      }
+
       setIsAddProductOpen(false);
-      
-      // Clear form
-      setPName("");
-      setPDesc("");
-      setPCategory("sprei");
-      setPCustomCategory("");
-      setPPrice("");
-      setPDiscount("0");
-      setPStock("10");
-      setPColors("");
-      setPSizes("");
-      setPImages("");
-      setPMaterial("");
-      setPCare("");
-      setPSizeGuide("");
-
-      showToast("Produk berhasil ditambahkan!");
+      setEditingProductId(null);
     } catch (err: any) {
       showToast("Gagal menambahkan produk: " + err.message, "error");
     } finally {
@@ -718,7 +716,23 @@ export default function AdminDashboardContent({
                 Daftar Produk ({products.length})
               </h2>
               <button
-                onClick={() => setIsAddProductOpen(true)}
+                onClick={() => {
+                  setEditingProductId(null);
+                  setPName("");
+                  setPDesc("");
+                  setPCategory("sprei");
+                  setPCustomCategory("");
+                  setPPrice("");
+                  setPDiscount("0");
+                  setPStock("10");
+                  setPColors("");
+                  setPSizes("");
+                  setPImages("");
+                  setPMaterial("");
+                  setPCare("");
+                  setPSizeGuide("");
+                  setIsAddProductOpen(true);
+                }}
                 className="flex items-center gap-1.5 px-5 py-2.5 bg-on-surface text-surface font-sans font-bold text-[10px] uppercase tracking-widest rounded-full hover:bg-surface-tint transition-all shadow-xs cursor-pointer"
               >
                 <Plus className="h-4 w-4" /> Tambah Produk
@@ -816,13 +830,44 @@ export default function AdminDashboardContent({
                             {product.sold_count}
                           </td>
                           <td className="py-4 px-6 text-center">
-                            <button
-                              onClick={() => handleDeleteProduct(product.id)}
-                              className="p-2 text-error hover:bg-red-500/10 rounded-md transition-colors btn-tactile cursor-pointer"
-                              title="Hapus Produk"
-                            >
-                              <Trash2 className="h-4.5 w-4.5" />
-                            </button>
+                            <div className="flex items-center justify-center gap-2">
+                              <button
+                                onClick={() => {
+                                  setEditingProductId(product.id);
+                                  setPName(product.name || "");
+                                  setPDesc(product.description || "");
+                                  const std = ["sprei", "bedcover", "selimut", "aksesoris"];
+                                  if (std.includes(product.category)) {
+                                    setPCategory(product.category);
+                                    setPCustomCategory("");
+                                  } else {
+                                    setPCategory("custom");
+                                    setPCustomCategory(product.category || "");
+                                  }
+                                  setPPrice((product.price || 0).toString());
+                                  setPDiscount((product.discount_percentage || 0).toString());
+                                  setPStock((product.stock || 0).toString());
+                                  setPColors(product.colors ? product.colors.join(", ") : "");
+                                  setPSizes(product.sizes ? product.sizes.join(", ") : "");
+                                  setPImages(product.images ? product.images.join(",") : "");
+                                  setPMaterial(product.material || "");
+                                  setPCare(product.care_instructions || "");
+                                  setPSizeGuide(product.size_guide || "");
+                                  setIsAddProductOpen(true);
+                                }}
+                                className="p-2 text-on-surface hover:bg-surface-tint rounded-md transition-colors btn-tactile cursor-pointer"
+                                title="Edit Produk"
+                              >
+                                <Edit className="h-4.5 w-4.5" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteProduct(product.id)}
+                                className="p-2 text-error hover:bg-red-500/10 rounded-md transition-colors btn-tactile cursor-pointer"
+                                title="Hapus Produk"
+                              >
+                                <Trash2 className="h-4.5 w-4.5" />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       );
@@ -1219,7 +1264,10 @@ export default function AdminDashboardContent({
           <div className="relative z-10 w-full max-w-lg rounded-2xl bg-surface p-6 md:p-8 border border-outline-variant/30 shadow-xl animate-scale-up max-h-[90vh] overflow-y-auto hide-scrollbar text-left">
             {/* Close */}
             <button
-              onClick={() => setIsAddProductOpen(false)}
+              onClick={() => {
+                setIsAddProductOpen(false);
+                setEditingProductId(null);
+              }}
               className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full hover:bg-surface-variant/40 text-on-surface-variant btn-tactile"
             >
               <X className="h-5 w-5" />
@@ -1229,7 +1277,7 @@ export default function AdminDashboardContent({
               Manajemen Produk
             </span>
             <h2 className="font-serif text-headline-lg text-on-surface mb-6">
-              Tambah Produk Baru
+              {editingProductId ? "Edit Produk" : "Tambah Produk Baru"}
             </h2>
 
             <form onSubmit={handleAddProductSubmit} className="flex flex-col gap-5">
@@ -1449,7 +1497,10 @@ export default function AdminDashboardContent({
               <div className="flex gap-3 border-t border-outline-variant/20 pt-4 mt-2">
                 <button
                   type="button"
-                  onClick={() => setIsAddProductOpen(false)}
+                  onClick={() => {
+                    setIsAddProductOpen(false);
+                    setEditingProductId(null);
+                  }}
                   className="flex-grow py-3 bg-surface border border-outline-variant text-on-surface font-sans font-bold text-label rounded-full tracking-widest uppercase hover:bg-surface-variant/30 transition-all btn-tactile cursor-pointer"
                 >
                   Batal
@@ -1459,7 +1510,7 @@ export default function AdminDashboardContent({
                   disabled={loading}
                   className="flex-grow py-3 bg-on-surface text-surface font-sans font-bold text-label rounded-full tracking-widest uppercase hover:bg-surface-tint transition-all btn-tactile cursor-pointer"
                 >
-                  {loading ? "Menyimpan..." : "Simpan Produk"}
+                  {loading ? "Menyimpan..." : editingProductId ? "Simpan Perubahan" : "Simpan Produk"}
                 </button>
               </div>
             </form>
