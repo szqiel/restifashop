@@ -43,7 +43,6 @@ export default function HeroCarousel({ products }: HeroCarouselProps) {
                 priority={index === 0}
                 className="object-cover object-center md:object-right"
                 quality={100}
-                unoptimized={true}
               />
             </div>
             {/* IDLIX-Style Left Gradient for Text Readability */}
