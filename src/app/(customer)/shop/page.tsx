@@ -76,10 +76,18 @@ export default async function ShopPage({ searchParams }: PageProps) {
   const focusSearch = params.focus === "search";
 
   // Fetch products and categories in parallel using memory-cached Next.js data-cache
-  const [products, allProducts] = await Promise.all([
+  const [products, allProducts, { data: settings }] = await Promise.all([
     getProductsCached(currentCategory, currentSearch, currentSort),
-    getCategoriesCached()
+    getCategoriesCached(),
+    supabase.from("store_settings").select("*").eq("id", 1).single()
   ]);
+
+  const shopBanner = settings?.shop_banner || {
+    title: "The Resort Collection",
+    description: "Rasakan kemewahan hotel bintang lima setiap malam di kamar tidur utama Anda.",
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDspoyrZ-C65kSNPrRIMje4Kriv53iQG5KC4G2y5qxKVqCbtSx_qrDz4KlWAPlgwReSBS-Q1f0fixbrbVTM1w9FgAFZY7FkdFW1HSSh1FtIJDfrrDtXQ9eHn-5HH3VwRFzL7mXWbIxdw6gLtX6fprfqTvAQ2RrdWLvCPnyQiTgcMyZEB_pzmHlPpEPXa960oyYYEF-NrJxP5uyUglZYLxR-fM1qGEAgSAfbXiZE-KP9SMz3oE1wuWlt",
+    link: "/shop?category=bedcover"
+  };
 
   const categoriesList = ["sprei", "bedcover", "selimut", "aksesoris"];
   if (allProducts) {
@@ -184,20 +192,20 @@ export default async function ShopPage({ searchParams }: PageProps) {
                   <div className="relative aspect-[16/9] md:aspect-[8/5] bg-surface-container-low mb-6 overflow-hidden rounded-xl border border-outline-variant/20 shadow-xs">
                     <Image
                       className="object-cover w-full h-full"
-                      alt="The Resort Collection"
+                      alt={shopBanner.title}
                       fill
                       sizes="(max-width: 1024px) 100vw, 60vw"
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuDspoyrZ-C65kSNPrRIMje4Kriv53iQG5KC4G2y5qxKVqCbtSx_qrDz4KlWAPlgwReSBS-Q1f0fixbrbVTM1w9FgAFZY7FkdFW1HSSh1FtIJDfrrDtXQ9eHn-5HH3VwRFzL7mXWbIxdw6gLtX6fprfqTvAQ2RrdWLvCPnyQiTgcMyZEB_pzmHlPpEPXa960oyYYEF-NrJxP5uyUglZYLxR-fM1qGEAgSAfbXiZE-KP9SMz3oE1wuWlt"
+                      src={shopBanner.image}
                     />
                     <div className="absolute bottom-6 left-6 bg-surface/90 backdrop-blur-xl p-4 md:p-6 rounded-lg shadow-sm border border-outline-variant/30 max-w-xs text-left animate-scale-up">
                       <h4 className="font-headline-md text-headline-md text-on-background mb-1">
-                        The Resort Collection
+                        {shopBanner.title}
                       </h4>
                       <p className="font-body-md text-xs md:text-sm text-secondary mb-3">
-                        Rasakan kemewahan hotel bintang lima setiap malam di kamar tidur utama Anda.
+                        {shopBanner.description}
                       </p>
                       <Link
-                        href="/shop?category=bedcover"
+                        href={shopBanner.link}
                         className="bg-primary-container text-on-primary-container px-4 py-2 font-label-caps text-label-caps hover:bg-primary hover:text-on-primary transition-all duration-300 rounded inline-block text-xs uppercase relative overflow-hidden group"
                       >
                         <span className="relative z-10">Lihat Koleksi</span>

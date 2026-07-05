@@ -26,18 +26,22 @@ import Image from "next/image";
 interface AdminDashboardContentProps {
   initialOrders: any[];
   initialProducts: any[];
+  initialSettings: any;
 }
 
 export default function AdminDashboardContent({
   initialOrders,
   initialProducts,
+  initialSettings,
 }: AdminDashboardContentProps) {
   const router = useRouter();
   const supabase = createClient();
 
-  const [activeTab, setActiveTab] = useState<"orders" | "products">("orders");
+  const [activeTab, setActiveTab] = useState<"orders" | "products" | "customizations">("orders");
   const [orders, setOrders] = useState(initialOrders);
   const [products, setProducts] = useState(initialProducts);
+  const [settings, setSettings] = useState(initialSettings || {});
+  const [savingSettings, setSavingSettings] = useState(false);
 
   // Orders filters
   const [searchTerm, setSearchTerm] = useState("");
@@ -320,6 +324,46 @@ export default function AdminDashboardContent({
     }
   };
 
+  // Delete Order
+  const handleDeleteOrder = async (id: string) => {
+    if (!confirm("Apakah Anda yakin ingin menghapus pesanan ini secara permanen?")) return;
+
+    try {
+      const { error } = await supabase
+        .from("orders")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+
+      setOrders(orders.filter(o => o.id !== id));
+      if (selectedOrder?.id === id) {
+        setSelectedOrder(null);
+      }
+      alert("Pesanan berhasil dihapus!");
+    } catch (err: any) {
+      alert("Gagal menghapus pesanan: " + err.message);
+    }
+  };
+
+  // Save Settings
+  const handleSaveSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingSettings(true);
+    try {
+      const { error } = await supabase
+        .from("store_settings")
+        .upsert({ id: 1, ...settings });
+
+      if (error) throw error;
+      alert("Kustomisasi berhasil disimpan!");
+    } catch (err: any) {
+      alert("Gagal menyimpan kustomisasi: " + err.message);
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
   // Orders filtering logic
   const filteredOrders = orders.filter((o) => {
     const matchesSearch =
@@ -400,6 +444,16 @@ export default function AdminDashboardContent({
             }`}
           >
             Kelola Produk
+          </button>
+          <button
+            onClick={() => setActiveTab("customizations")}
+            className={`px-5 py-2.5 font-sans font-bold text-xs uppercase tracking-widest rounded-full cursor-pointer transition-all border ${
+              activeTab === "customizations"
+                ? "bg-on-surface text-surface border-on-surface"
+                : "bg-surface border-outline-variant text-on-surface-variant hover:border-on-surface"
+            }`}
+          >
+            Kustomisasi
           </button>
         </div>
 
@@ -566,15 +620,25 @@ export default function AdminDashboardContent({
                           Rp {order.subtotal.toLocaleString("id-ID")}
                         </td>
                         <td className="py-4 px-6 text-center">
-                          <button
-                            onClick={() => {
-                              setSelectedOrder(order);
-                              setNotesText(order.notes || "");
-                            }}
-                            className="p-2 text-on-surface hover:bg-surface-variant/30 rounded-md transition-colors btn-tactile cursor-pointer"
-                          >
-                            <Eye className="h-4.5 w-4.5" />
-                          </button>
+                          <div className="flex gap-1 justify-center">
+                            <button
+                              onClick={() => {
+                                setSelectedOrder(order);
+                                setNotesText(order.notes || "");
+                              }}
+                              className="p-2 text-on-surface hover:bg-surface-variant/30 rounded-md transition-colors btn-tactile cursor-pointer"
+                              title="Lihat Detail"
+                            >
+                              <Eye className="h-4.5 w-4.5" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteOrder(order.id)}
+                              className="p-2 text-error hover:bg-red-500/10 rounded-md transition-colors btn-tactile cursor-pointer"
+                              title="Hapus Pesanan"
+                            >
+                              <Trash2 className="h-4.5 w-4.5" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -583,7 +647,7 @@ export default function AdminDashboardContent({
               </table>
             </div>
           </>
-        ) : (
+        ) : activeTab === "products" ? (
           <>
             {/* Products Control Row */}
             <div className="flex justify-between items-center mb-6">
@@ -705,7 +769,94 @@ export default function AdminDashboardContent({
               </table>
             </div>
           </>
-        )}
+        ) : activeTab === "customizations" ? (
+          <>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="font-serif text-headline-md text-on-surface">
+                Pengaturan Kustomisasi
+              </h2>
+              <button
+                onClick={handleSaveSettings}
+                disabled={savingSettings}
+                className="flex items-center gap-1.5 px-5 py-2.5 bg-on-surface text-surface font-sans font-bold text-[10px] uppercase tracking-widest rounded-full hover:bg-surface-tint transition-all shadow-xs cursor-pointer"
+              >
+                <Save className="h-4 w-4" /> {savingSettings ? "Menyimpan..." : "Simpan Kustomisasi"}
+              </button>
+            </div>
+
+            <div className="bg-surface border border-outline-variant/40 rounded-xl shadow-xs p-6 mb-6">
+              <h3 className="font-serif text-body-lg font-bold text-on-surface mb-4 border-b border-outline-variant/20 pb-2">
+                Halaman Produk
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1.5">
+                    Info Pengiriman & Pengembalian
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={settings.shipping_info || ""}
+                    onChange={(e) => setSettings({ ...settings, shipping_info: e.target.value })}
+                    className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 bg-surface font-sans text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none transition-all resize-none shadow-2xs"
+                  />
+                </div>
+                <div>
+                  <label className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1.5">
+                    Kebijakan Garansi / Retur
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={settings.return_info || ""}
+                    onChange={(e) => setSettings({ ...settings, return_info: e.target.value })}
+                    className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 bg-surface font-sans text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none transition-all resize-none shadow-2xs"
+                  />
+                </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div>
+                  <label className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1.5">
+                    Data Koleksi Beranda (Advanced - JSON)
+                  </label>
+                  <textarea
+                    rows={6}
+                    value={typeof settings.home_collections === 'string' ? settings.home_collections : JSON.stringify(settings.home_collections || [], null, 2)}
+                    onChange={(e) => {
+                      try {
+                        const parsed = JSON.parse(e.target.value);
+                        setSettings({ ...settings, home_collections: parsed });
+                      } catch {
+                        // Allow typing invalid json temporarily
+                        setSettings({ ...settings, home_collections: e.target.value });
+                      }
+                    }}
+                    className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 bg-surface font-sans text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none transition-all resize-vertical shadow-2xs font-mono"
+                  />
+                  <span className="text-[9px] text-on-surface-variant/70 mt-1 block">Pastikan format JSON valid saat disimpan.</span>
+                </div>
+                <div>
+                  <label className="block font-sans font-bold text-[9px] text-on-surface-variant uppercase tracking-widest mb-1.5">
+                    Banner Promo Shop (Advanced - JSON)
+                  </label>
+                  <textarea
+                    rows={6}
+                    value={typeof settings.shop_banner === 'string' ? settings.shop_banner : JSON.stringify(settings.shop_banner || {}, null, 2)}
+                    onChange={(e) => {
+                      try {
+                        const parsed = JSON.parse(e.target.value);
+                        setSettings({ ...settings, shop_banner: parsed });
+                      } catch {
+                        // Allow typing invalid json temporarily
+                        setSettings({ ...settings, shop_banner: e.target.value });
+                      }
+                    }}
+                    className="w-full border border-outline-variant/50 rounded-lg px-3 py-2 bg-surface font-sans text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none transition-all resize-vertical shadow-2xs font-mono"
+                  />
+                  <span className="text-[9px] text-on-surface-variant/70 mt-1 block">Pastikan format JSON valid saat disimpan.</span>
+                </div>
+              </div>
+            </div>
+          </>
+        ) : null}
       </div>
 
       {/* Order Detail Modal */}
@@ -843,6 +994,12 @@ export default function AdminDashboardContent({
                 className="py-3 px-6 bg-on-surface text-surface font-sans font-bold text-label rounded-full tracking-widest uppercase transition-all hover:bg-surface-tint btn-tactile cursor-pointer"
               >
                 Selesai
+              </button>
+              <button
+                onClick={() => handleDeleteOrder(selectedOrder.id)}
+                className="py-3 px-6 bg-error/10 text-error border border-error/20 font-sans font-bold text-label rounded-full tracking-widest uppercase transition-all hover:bg-error/20 btn-tactile cursor-pointer"
+              >
+                Hapus
               </button>
             </div>
           </div>
@@ -1084,9 +1241,6 @@ export default function AdminDashboardContent({
                     </label>
                   </div>
                 </div>
-                <span className="block text-[9px] text-on-surface-variant/60 mt-1 font-sans">
-                  *Anda dapat mengunggah file langsung ke Storage Supabase atau memasukkan URL gambar web dari Google Photos/Cloudinary secara langsung.
-                </span>
               </div>
 
               {/* Actions */}

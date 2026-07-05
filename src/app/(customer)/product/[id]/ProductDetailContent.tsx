@@ -10,11 +10,13 @@ import { ChevronDown, ArrowRight, Check, ShoppingBag, X } from "lucide-react";
 interface ProductDetailContentProps {
   product: Product;
   relatedProducts: Product[];
+  storeSettings?: any;
 }
 
 export default function ProductDetailContent({
   product,
   relatedProducts,
+  storeSettings,
 }: ProductDetailContentProps) {
   const { addItem, setIsOpen, setIsCheckoutOpen } = useCartStore();
 
@@ -278,13 +280,13 @@ export default function ProductDetailContent({
               <span>Bahan & Perawatan</span>
               <ChevronDown className="h-5 w-5 transform group-open:rotate-180 transition-transform duration-300 text-secondary" />
             </summary>
-            <div className="pt-4 font-body-md text-sm text-on-surface-variant space-y-2 leading-relaxed">
-              <p>{product.material || "100% Serat organik pilihan, ditenun halus untuk memberikan kelembutan maksimal dan kenyamanan tidur terbaik."}</p>
-              <ul className="list-disc pl-5 space-y-1">
-                <li>{product.care_instructions || "Cuci dengan air dingin menggunakan putaran mesin cuci lambat."}</li>
-                <li>Keringkan dengan mesin pengering putaran rendah, segera keluarkan setelah kering.</li>
-                <li>Jangan gunakan pemutih atau pelembut pakaian secara berlebihan.</li>
-              </ul>
+            <div className="pt-4 font-body-md text-sm text-on-surface-variant space-y-2 leading-relaxed whitespace-pre-wrap">
+              {product.material && <p className="mb-2">{product.material}</p>}
+              {product.care_instructions && (
+                <div className="pl-4 border-l-2 border-primary/20 italic">
+                  {product.care_instructions}
+                </div>
+              )}
             </div>
           </details>
 
@@ -294,9 +296,13 @@ export default function ProductDetailContent({
               <span>Pengiriman & Pengembalian</span>
               <ChevronDown className="h-5 w-5 transform group-open:rotate-180 transition-transform duration-300 text-secondary" />
             </summary>
-            <div className="pt-4 font-body-md text-sm text-on-surface-variant space-y-2 leading-relaxed">
-              <p>Pengiriman ekspres di Pulau Jawa & Bali (2-3 hari kerja). Kepulauan luar membutuhkan waktu 4-7 hari kerja.</p>
-              <p>Jika Anda tidak sepenuhnya puas dengan kualitas produk, kembalikan dalam waktu 30 hari untuk pengembalian dana penuh.</p>
+            <div className="pt-4 font-body-md text-sm text-on-surface-variant space-y-2 leading-relaxed whitespace-pre-wrap">
+              {storeSettings?.shipping_info ? (
+                <p className="mb-3">{storeSettings.shipping_info}</p>
+              ) : null}
+              {storeSettings?.return_info ? (
+                <p>{storeSettings.return_info}</p>
+              ) : null}
             </div>
           </details>
         </div>

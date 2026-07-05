@@ -69,13 +69,19 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const id = (await params).id;
   const { product, related } = await getProductData(id);
 
+  const { data: settings } = await supabase
+    .from("store_settings")
+    .select("*")
+    .eq("id", 1)
+    .single();
+
   if (!product) {
     notFound();
   }
 
   return (
     <main className="flex-grow bg-primary-bg">
-      <ProductDetailContent product={product} relatedProducts={related} />
+      <ProductDetailContent product={product} relatedProducts={related} storeSettings={settings} />
     </main>
   );
 }

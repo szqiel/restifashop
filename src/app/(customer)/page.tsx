@@ -30,6 +30,18 @@ async function getFeaturedProducts(): Promise<Product[]> {
 export default async function HomePage() {
   const featuredProducts = await getFeaturedProducts();
 
+  const { data: settings } = await supabase
+    .from("store_settings")
+    .select("*")
+    .eq("id", 1)
+    .single();
+
+  const collections = settings?.home_collections || [
+    { title: "Bedcover", subtitle: "Koleksi", image: "/images/category-bedcover.jpg", link: "/shop?category=bedcover", type: "large" },
+    { title: "Sprei", subtitle: "Koleksi Utama", image: "/images/category-sprei.jpg", link: "/shop?category=sprei", type: "tall" },
+    { title: "Selimut", subtitle: "Kenyamanan", image: "/images/category-selimut.jpg", link: "/shop?category=selimut", type: "standard" }
+  ];
+
   return (
     <main className="flex-grow">
       {/* Hero Section (Asymmetric) */}
@@ -81,83 +93,40 @@ export default async function HomePage() {
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-element-gap md:gap-gutter auto-rows-[300px] md:auto-rows-[400px]">
-            {/* Bedcover (Large) */}
-            <Link
-              href="/shop?category=bedcover"
-              className="md:col-span-2 relative rounded-xl overflow-hidden group block parallax-zoom bg-surface-dim"
-            >
-              <Image
-                alt="Premium Bedcover"
-                fill
-                sizes="(max-width: 768px) 100vw, 60vw"
-                className="object-cover"
-                src="/images/category-bedcover.jpg"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-              <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end text-left">
-                <div>
-                  <span className="font-label-caps text-label-caps text-white/80 block mb-2 uppercase tracking-wider">
-                    Koleksi
-                  </span>
-                  <h3 className="font-headline-sm text-headline-sm text-white">Bedcover</h3>
-                </div>
-                <div className="bg-white/20 backdrop-blur-md rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <ArrowUpRight className="h-5 w-5 text-white" />
-                </div>
-              </div>
-            </Link>
+            {collections.map((col: any, idx: number) => {
+              const gridClass = 
+                col.type === "large" ? "md:col-span-2 relative rounded-xl overflow-hidden group block parallax-zoom bg-surface-dim" :
+                col.type === "tall" ? "md:col-span-1 md:row-span-2 relative rounded-xl overflow-hidden group block parallax-zoom bg-surface-dim" :
+                "md:col-span-2 relative rounded-xl overflow-hidden group block parallax-zoom bg-surface-dim"; // standard
 
-            {/* Sprei (Tall) */}
-            <Link
-              href="/shop?category=sprei"
-              className="md:col-span-1 md:row-span-2 relative rounded-xl overflow-hidden group block parallax-zoom bg-surface-dim"
-            >
-              <Image
-                alt="Premium Sprei"
-                fill
-                sizes="(max-width: 768px) 100vw, 30vw"
-                className="object-cover"
-                src="/images/category-sprei.jpg"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-              <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end text-left">
-                <div>
-                  <span className="font-label-caps text-label-caps text-white/80 block mb-2 uppercase tracking-wider">
-                    Koleksi Utama
-                  </span>
-                  <h3 className="font-headline-sm text-headline-sm text-white">Sprei</h3>
-                </div>
-                <div className="bg-white/20 backdrop-blur-md rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <ArrowUpRight className="h-5 w-5 text-white" />
-                </div>
-              </div>
-            </Link>
-
-            {/* Selimut (Standard) */}
-            <Link
-              href="/shop?category=selimut"
-              className="md:col-span-2 relative rounded-xl overflow-hidden group block parallax-zoom bg-surface-dim"
-            >
-              <Image
-                alt="Premium Selimut"
-                fill
-                sizes="(max-width: 768px) 100vw, 60vw"
-                className="object-cover"
-                src="/images/category-selimut.jpg"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-              <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end text-left">
-                <div>
-                  <span className="font-label-caps text-label-caps text-white/80 block mb-2 uppercase tracking-wider">
-                    Kenyamanan
-                  </span>
-                  <h3 className="font-headline-sm text-headline-sm text-white">Selimut</h3>
-                </div>
-                <div className="bg-white/20 backdrop-blur-md rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <ArrowUpRight className="h-5 w-5 text-white" />
-                </div>
-              </div>
-            </Link>
+              return (
+                <Link
+                  key={idx}
+                  href={col.link}
+                  className={gridClass}
+                >
+                  <Image
+                    alt={col.title}
+                    fill
+                    sizes={col.type === "tall" ? "(max-width: 768px) 100vw, 30vw" : "(max-width: 768px) 100vw, 60vw"}
+                    className="object-cover"
+                    src={col.image}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                  <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end text-left">
+                    <div>
+                      <span className="font-label-caps text-label-caps text-white/80 block mb-2 uppercase tracking-wider">
+                        {col.subtitle}
+                      </span>
+                      <h3 className="font-headline-sm text-headline-sm text-white">{col.title}</h3>
+                    </div>
+                    <div className="bg-white/20 backdrop-blur-md rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      <ArrowUpRight className="h-5 w-5 text-white" />
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>

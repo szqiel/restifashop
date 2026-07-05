@@ -35,8 +35,15 @@ export default async function AdminDashboardPage() {
     .select("*")
     .order("created_at", { ascending: false });
 
-  if (productsError) {
-    console.error("Error fetching admin products:", productsError);
+  // 3. Fetch store settings for customization
+  const { data: settings, error: settingsError } = await supabase
+    .from("store_settings")
+    .select("*")
+    .eq("id", 1)
+    .single();
+
+  if (settingsError && settingsError.code !== 'PGRST116') {
+    console.error("Error fetching admin settings:", settingsError);
   }
 
   return (
@@ -44,6 +51,7 @@ export default async function AdminDashboardPage() {
       <AdminDashboardContent 
         initialOrders={orders || []} 
         initialProducts={products || []} 
+        initialSettings={settings || {}}
       />
     </main>
   );
