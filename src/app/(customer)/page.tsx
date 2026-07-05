@@ -3,8 +3,30 @@ import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { Product } from "@/types";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
+import HeroCarousel from "@/components/HeroCarousel";
 
 export const dynamic = "force-dynamic";
+
+// Server-side fetching for home page carousel
+async function getLatestProducts(): Promise<Product[]> {
+  try {
+    const isPlaceholder = !process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder-url");
+    if (isPlaceholder) {
+      return [];
+    }
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .range(0, 4); // top 5 products
+
+    if (error) throw error;
+    return data && data.length > 0 ? data : [];
+  } catch (err) {
+    console.error("Error fetching latest products:", err);
+    return [];
+  }
+}
 
 // Server-side fetching for home page products
 async function getFeaturedProducts(): Promise<Product[]> {
@@ -29,6 +51,7 @@ async function getFeaturedProducts(): Promise<Product[]> {
 
 export default async function HomePage() {
   const featuredProducts = await getFeaturedProducts();
+  const latestProducts = await getLatestProducts();
 
   const { data: settings } = await supabase
     .from("store_settings")
@@ -44,41 +67,8 @@ export default async function HomePage() {
 
   return (
     <main className="flex-grow">
-      {/* Hero Section (Asymmetric) */}
-      <section className="max-w-container-max mx-auto px-margin-mobile md:px-gutter py-16 md:py-24">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter items-center">
-          {/* Text Content (5 cols) */}
-          <div className="md:col-span-5 flex flex-col justify-center items-start space-y-6 z-10 md:pr-8 text-left">
-            <h1 className="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-surface leading-tight tracking-tighter">
-              Artistry in Every Thread.
-            </h1>
-            <p className="font-body-lg text-body-lg text-on-surface-variant max-w-md">
-              Rasakan puncak keahlian pengrajin Indonesia. Perlengkapan tidur premium yang dirancang khusus untuk Anda yang menghargai kemewahan dalam kesederhanaan.
-            </p>
-            <Link
-              href="/shop"
-              className="inline-flex items-center justify-center bg-primary-container text-on-primary-container font-label-caps text-label-caps px-10 py-4 md:px-12 rounded-xl hover:scale-95 transition-all duration-300 shadow-[0_4px_14px_0_rgba(212,175,55,0.39)] uppercase tracking-widest relative overflow-hidden group"
-            >
-              <span className="relative z-10 flex items-center justify-center">
-                Beli Sekarang
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </span>
-              <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
-            </Link>
-          </div>
-          {/* Image Content (7 cols) */}
-          <div className="md:col-span-7 relative h-[400px] md:h-[650px] w-full rounded-2xl overflow-hidden mt-8 md:mt-0 parallax-zoom group shadow-xl">
-            <Image
-              alt="Premium Bedding"
-              fill
-              priority
-              sizes="(max-width: 768px) 100vw, 60vw"
-              className="object-cover"
-              src="/images/hero-bedding.jpg"
-            />
-          </div>
-        </div>
-      </section>
+      {/* Hero Carousel Section */}
+      <HeroCarousel products={latestProducts} />
 
       {/* Bento Grid Categories */}
       <section className="bg-surface-bright py-16 md:py-24 border-t border-outline-variant/10">
