@@ -43,6 +43,13 @@ export default function AdminDashboardContent({
   const [settings, setSettings] = useState(initialSettings || {});
   const [lastSavedSettings, setLastSavedSettings] = useState(initialSettings || {});
   const [savingSettings, setSavingSettings] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+
+  const showToast = (message: string, type: "success" | "error" = "success") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 2000);
+  };
+
   const hasUnsavedChanges = JSON.stringify(settings) !== JSON.stringify(lastSavedSettings);
 
   // Orders filters
@@ -110,7 +117,7 @@ export default function AdminDashboardContent({
         setSelectedOrder({ ...selectedOrder, status: newStatus });
       }
     } catch (err: any) {
-      alert("Gagal memperbarui status order: " + err.message);
+      showToast("Gagal memperbarui status order: " + err.message, "error");
     }
   };
 
@@ -134,9 +141,9 @@ export default function AdminDashboardContent({
         )
       );
       setSelectedOrder({ ...selectedOrder, notes: notesText });
-      alert("Catatan berhasil disimpan!");
+      showToast("Catatan berhasil disimpan!");
     } catch (err: any) {
-      alert("Gagal menyimpan catatan: " + err.message);
+      showToast("Gagal menyimpan catatan: " + err.message, "error");
     } finally {
       setSavingNotes(false);
     }
@@ -234,10 +241,10 @@ export default function AdminDashboardContent({
       if (data?.publicUrl) {
         const currentUrls = pImages.trim() ? pImages.split(",") : [];
         setPImages([...currentUrls, data.publicUrl].join(","));
-        alert("Gambar berhasil diunggah!");
+        showToast("Gambar berhasil diunggah!");
       }
     } catch (err: any) {
-      alert(err.message || "Gagal mengunggah gambar.");
+      showToast(err.message || "Gagal mengunggah gambar.", "error");
     } finally {
       setUploadingImage(false);
     }
@@ -267,10 +274,10 @@ export default function AdminDashboardContent({
 
       if (data?.publicUrl) {
         callback(data.publicUrl);
-        alert("Gambar berhasil diunggah!");
+        showToast("Gambar berhasil diunggah!");
       }
     } catch (err: any) {
-      alert(err.message || "Gagal mengunggah gambar.");
+      showToast(err.message || "Gagal mengunggah gambar.", "error");
     } finally {
       setUploadingImage(false);
     }
@@ -280,14 +287,14 @@ export default function AdminDashboardContent({
   const handleAddProductSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!pName.trim()) return alert("Nama produk wajib diisi");
-    if (!pPrice || parseFloat(pPrice) <= 0) return alert("Harga produk harus lebih dari 0");
+    if (!pName.trim()) return showToast("Nama produk wajib diisi", "error");
+    if (!pPrice || parseFloat(pPrice) <= 0) return showToast("Harga produk harus lebih dari 0", "error");
 
     const categoryToSave = pCategory === "custom" 
       ? pCustomCategory.trim().toLowerCase() 
       : pCategory.toLowerCase();
 
-    if (!categoryToSave) return alert("Kategori produk wajib ditentukan");
+    if (!categoryToSave) return showToast("Kategori produk wajib ditentukan", "error");
 
     const colorsArray = pColors.split(",").map(c => c.trim()).filter(Boolean);
     const sizesArray = pSizes.split(",").map(s => s.trim()).filter(Boolean);
@@ -342,9 +349,9 @@ export default function AdminDashboardContent({
       setPCare("");
       setPSizeGuide("");
 
-      alert("Produk berhasil ditambahkan!");
+      showToast("Produk berhasil ditambahkan!");
     } catch (err: any) {
-      alert("Gagal menambahkan produk: " + err.message);
+      showToast("Gagal menambahkan produk: " + err.message, "error");
     } finally {
       setLoading(false);
     }
@@ -366,9 +373,9 @@ export default function AdminDashboardContent({
           if (error) throw error;
 
           setProducts(products.filter(p => p.id !== id));
-          alert("Produk berhasil dihapus!");
+          showToast("Produk berhasil dihapus!");
         } catch (err: any) {
-          alert("Gagal menghapus produk: " + err.message);
+          showToast("Gagal menghapus produk: " + err.message, "error");
         }
       }
     });
@@ -393,9 +400,9 @@ export default function AdminDashboardContent({
           if (selectedOrder?.id === id) {
             setSelectedOrder(null);
           }
-          alert("Pesanan berhasil dihapus!");
+          showToast("Pesanan berhasil dihapus!");
         } catch (err: any) {
-          alert("Gagal menghapus pesanan: " + err.message);
+          showToast("Gagal menghapus pesanan: " + err.message, "error");
         }
       }
     });
@@ -412,9 +419,9 @@ export default function AdminDashboardContent({
 
       if (error) throw error;
       setLastSavedSettings(settings);
-      alert("Kustomisasi berhasil disimpan!");
+      showToast("Kustomisasi berhasil disimpan!");
     } catch (err: any) {
-      alert("Gagal menyimpan kustomisasi: " + err.message);
+      showToast("Gagal menyimpan kustomisasi: " + err.message, "error");
     } finally {
       setSavingSettings(false);
     }
@@ -1488,6 +1495,18 @@ export default function AdminDashboardContent({
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed top-6 right-6 z-[100] px-6 py-4 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] flex items-center gap-3 animate-slide-left ${toast.type === 'success' ? 'bg-surface text-on-surface border border-outline-variant/30' : 'bg-error text-white'}`}>
+          {toast.type === 'success' ? (
+            <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+          ) : (
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          )}
+          <span className="font-sans font-medium">{toast.message}</span>
         </div>
       )}
     </div>
