@@ -34,17 +34,29 @@ export default function HeroCarousel({ products }: HeroCarouselProps) {
               isActive ? "opacity-100 z-10" : "opacity-0 z-0"
             }`}
           >
-            {/* Background Image */}
-            <div className="absolute inset-0 w-full h-full">
+            {/* Blurred Cinematic Backdrop */}
+            <div className="absolute inset-0 w-full h-full opacity-40">
               <Image
                 src={product.images?.[0] || "/images/placeholder.jpg"}
-                alt={product.name}
+                alt=""
                 fill
-                priority={index === 0}
-                className="object-cover object-center md:object-right"
-               quality={95} />
+                className="object-cover blur-2xl scale-110"
+              />
             </div>
 
+            {/* Sharp Foreground Image (Contained) */}
+            <div className="absolute inset-0 w-full h-full flex justify-end items-center">
+              <div className="relative w-full md:w-1/2 h-[90%] md:h-full mr-0 md:mr-gutter">
+                <Image
+                  src={product.images?.[0] || "/images/placeholder.jpg"}
+                  alt={product.name}
+                  fill
+                  priority={index === 0}
+                  className="object-contain object-right"
+                  quality={100}
+                />
+              </div>
+            </div>
             {/* IDLIX-Style Left Gradient for Text Readability */}
             <div className="absolute inset-0 w-full md:w-3/4 bg-gradient-to-r from-surface via-surface/95 to-transparent"></div>
             
