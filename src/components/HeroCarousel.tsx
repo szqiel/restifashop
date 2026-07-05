@@ -24,7 +24,7 @@ export default function HeroCarousel({ products }: HeroCarouselProps) {
   if (!products || products.length === 0) return null;
 
   return (
-    <section className="relative w-full h-[550px] md:h-[700px] overflow-hidden">
+    <section className="relative w-full h-[450px] md:h-[550px] overflow-hidden">
       {products.map((product, index) => {
         const isActive = index === currentIndex;
         return (
@@ -34,28 +34,16 @@ export default function HeroCarousel({ products }: HeroCarouselProps) {
               isActive ? "opacity-100 z-10" : "opacity-0 z-0"
             }`}
           >
-            {/* Blurred Cinematic Backdrop */}
-            <div className="absolute inset-0 w-full h-full opacity-40">
+            {/* Background Image */}
+            <div className="absolute inset-0 w-full h-full">
               <Image
                 src={product.images?.[0] || "/images/placeholder.jpg"}
-                alt=""
+                alt={product.name}
                 fill
-                className="object-cover blur-2xl scale-110"
+                priority={index === 0}
+                className="object-cover object-center md:object-right"
+                quality={100}
               />
-            </div>
-
-            {/* Sharp Foreground Image (Contained) */}
-            <div className="absolute inset-0 w-full h-full flex justify-end items-center">
-              <div className="relative w-full md:w-1/2 h-[90%] md:h-full mr-0 md:mr-gutter">
-                <Image
-                  src={product.images?.[0] || "/images/placeholder.jpg"}
-                  alt={product.name}
-                  fill
-                  priority={index === 0}
-                  className="object-contain object-right"
-                  quality={100}
-                />
-              </div>
             </div>
             {/* IDLIX-Style Left Gradient for Text Readability */}
             <div className="absolute inset-0 w-full md:w-3/4 bg-gradient-to-r from-surface via-surface/95 to-transparent"></div>
