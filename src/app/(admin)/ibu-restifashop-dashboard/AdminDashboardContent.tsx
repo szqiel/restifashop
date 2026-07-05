@@ -58,6 +58,16 @@ export default function AdminDashboardContent({
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
 
+  // Custom Confirm Modal State
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    message: string;
+    onConfirm: () => void;
+  }>({
+    isOpen: false,
+    message: "",
+    onConfirm: () => {},
+  });
   // Add product form states
   const [pName, setPName] = useState("");
   const [pDesc, setPDesc] = useState("");
@@ -224,7 +234,6 @@ export default function AdminDashboardContent({
         setPImages([...currentUrls, data.publicUrl].join(","));
         alert("Gambar berhasil diunggah!");
       }
-      }
     } catch (err: any) {
       alert(err.message || "Gagal mengunggah gambar.");
     } finally {
@@ -340,44 +349,54 @@ export default function AdminDashboardContent({
   };
 
   // Delete product
-  const handleDeleteProduct = async (id: string) => {
-    if (!confirm("Apakah Anda yakin ingin menghapus produk ini?")) return;
+  const handleDeleteProduct = (id: string) => {
+    setConfirmDialog({
+      isOpen: true,
+      message: "Apakah Anda yakin ingin menghapus produk ini?",
+      onConfirm: async () => {
+        setConfirmDialog({ ...confirmDialog, isOpen: false });
+        try {
+          const { error } = await supabase
+            .from("products")
+            .delete()
+            .eq("id", id);
 
-    try {
-      const { error } = await supabase
-        .from("products")
-        .delete()
-        .eq("id", id);
+          if (error) throw error;
 
-      if (error) throw error;
-
-      setProducts(products.filter(p => p.id !== id));
-      alert("Produk berhasil dihapus!");
-    } catch (err: any) {
-      alert("Gagal menghapus produk: " + err.message);
-    }
+          setProducts(products.filter(p => p.id !== id));
+          alert("Produk berhasil dihapus!");
+        } catch (err: any) {
+          alert("Gagal menghapus produk: " + err.message);
+        }
+      }
+    });
   };
 
   // Delete Order
-  const handleDeleteOrder = async (id: string) => {
-    if (!confirm("Apakah Anda yakin ingin menghapus pesanan ini secara permanen?")) return;
+  const handleDeleteOrder = (id: string) => {
+    setConfirmDialog({
+      isOpen: true,
+      message: "Apakah Anda yakin ingin menghapus pesanan ini secara permanen?",
+      onConfirm: async () => {
+        setConfirmDialog({ ...confirmDialog, isOpen: false });
+        try {
+          const { error } = await supabase
+            .from("orders")
+            .delete()
+            .eq("id", id);
 
-    try {
-      const { error } = await supabase
-        .from("orders")
-        .delete()
-        .eq("id", id);
+          if (error) throw error;
 
-      if (error) throw error;
-
-      setOrders(orders.filter(o => o.id !== id));
-      if (selectedOrder?.id === id) {
-        setSelectedOrder(null);
+          setOrders(orders.filter(o => o.id !== id));
+          if (selectedOrder?.id === id) {
+            setSelectedOrder(null);
+          }
+          alert("Pesanan berhasil dihapus!");
+        } catch (err: any) {
+          alert("Gagal menghapus pesanan: " + err.message);
+        }
       }
-      alert("Pesanan berhasil dihapus!");
-    } catch (err: any) {
-      alert("Gagal menghapus pesanan: " + err.message);
-    }
+    });
   };
 
   // Save Settings
@@ -1422,6 +1441,37 @@ export default function AdminDashboardContent({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Confirmation Modal */}
+      {confirmDialog.isOpen && (
+        <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-300"
+            onClick={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
+          />
+          <div className="relative z-10 w-full max-w-sm rounded-2xl bg-surface p-6 border border-outline-variant/30 shadow-xl animate-scale-up text-center">
+            <h3 className="font-serif text-headline-sm font-bold text-on-surface mb-3">
+              Konfirmasi
+            </h3>
+            <p className="font-sans text-sm text-on-surface-variant mb-6">
+              {confirmDialog.message}
+            </p>
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
+                className="flex-1 py-2.5 px-4 bg-surface-variant text-on-surface-variant font-sans font-bold text-[10px] uppercase tracking-widest rounded-full hover:bg-surface-tint transition-all cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                onClick={confirmDialog.onConfirm}
+                className="flex-1 py-2.5 px-4 bg-error text-white font-sans font-bold text-[10px] uppercase tracking-widest rounded-full hover:bg-red-700 transition-all cursor-pointer shadow-md shadow-error/20"
+              >
+                Ya, Hapus
+              </button>
+            </div>
           </div>
         </div>
       )}
