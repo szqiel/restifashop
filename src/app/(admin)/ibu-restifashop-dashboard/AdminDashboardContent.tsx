@@ -41,7 +41,9 @@ export default function AdminDashboardContent({
   const [orders, setOrders] = useState(initialOrders);
   const [products, setProducts] = useState(initialProducts);
   const [settings, setSettings] = useState(initialSettings || {});
+  const [lastSavedSettings, setLastSavedSettings] = useState(initialSettings || {});
   const [savingSettings, setSavingSettings] = useState(false);
+  const hasUnsavedChanges = JSON.stringify(settings) !== JSON.stringify(lastSavedSettings);
 
   // Orders filters
   const [searchTerm, setSearchTerm] = useState("");
@@ -409,6 +411,7 @@ export default function AdminDashboardContent({
         .upsert({ id: 1, ...settings });
 
       if (error) throw error;
+      setLastSavedSettings(settings);
       alert("Kustomisasi berhasil disimpan!");
     } catch (err: any) {
       alert("Gagal menyimpan kustomisasi: " + err.message);
@@ -828,13 +831,15 @@ export default function AdminDashboardContent({
               <h2 className="font-serif text-headline-md text-on-surface">
                 Pengaturan Kustomisasi
               </h2>
-              <button
-                onClick={handleSaveSettings}
-                disabled={savingSettings}
-                className="flex items-center gap-1.5 px-5 py-2.5 bg-on-surface text-surface font-sans font-bold text-[10px] uppercase tracking-widest rounded-full hover:bg-surface-tint transition-all shadow-xs cursor-pointer"
-              >
-                <Save className="h-4 w-4" /> {savingSettings ? "Menyimpan..." : "Simpan Kustomisasi"}
-              </button>
+              {hasUnsavedChanges && (
+                <button
+                  onClick={handleSaveSettings}
+                  disabled={savingSettings}
+                  className="flex items-center gap-1.5 px-5 py-2.5 bg-on-surface text-surface font-sans font-bold text-[10px] uppercase tracking-widest rounded-full hover:bg-surface-tint transition-all shadow-xs cursor-pointer animate-scale-up"
+                >
+                  <Save className="h-4 w-4" /> {savingSettings ? "Menyimpan..." : "Simpan Kustomisasi"}
+                </button>
+              )}
             </div>
 
             <div className="bg-surface border border-outline-variant/40 rounded-xl shadow-xs p-6 mb-6">
@@ -1035,16 +1040,18 @@ export default function AdminDashboardContent({
             </div>
 
             {/* Sticky Save Bar */}
-            <div className="fixed bottom-0 left-0 right-0 p-4 md:p-6 bg-surface/80 backdrop-blur-xl border-t border-outline-variant/30 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] z-40 flex justify-center md:justify-end animate-scale-up">
-              <button
-                onClick={handleSaveSettings}
-                disabled={savingSettings}
-                className="flex items-center gap-2 px-8 py-4 bg-on-surface text-surface font-sans font-bold text-xs uppercase tracking-widest rounded-full hover:bg-surface-tint transition-all shadow-xl cursor-pointer hover:-translate-y-1 active:translate-y-0"
-              >
-                <Save className="h-5 w-5" /> 
-                {savingSettings ? "Menyimpan..." : "Simpan Kustomisasi"}
-              </button>
-            </div>
+            {hasUnsavedChanges && (
+              <div className="fixed bottom-0 left-0 right-0 p-4 md:p-6 bg-surface/80 backdrop-blur-xl border-t border-outline-variant/30 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] z-40 flex justify-center md:justify-end animate-slide-up">
+                <button
+                  onClick={handleSaveSettings}
+                  disabled={savingSettings}
+                  className="flex items-center gap-2 px-8 py-4 bg-on-surface text-surface font-sans font-bold text-xs uppercase tracking-widest rounded-full hover:bg-surface-tint transition-all shadow-xl cursor-pointer hover:-translate-y-1 active:translate-y-0"
+                >
+                  <Save className="h-5 w-5" /> 
+                  {savingSettings ? "Menyimpan..." : "Simpan Kustomisasi"}
+                </button>
+              </div>
+            )}
           </>
         ) : null}
       </div>
