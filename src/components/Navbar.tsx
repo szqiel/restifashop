@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useCartStore } from "@/store/useCartStore";
 import { Search, ShoppingBag, User, Menu, X } from "lucide-react";
@@ -56,9 +57,16 @@ export default function Navbar() {
           {/* Brand Logo & Name */}
           <Link
             href="/"
-            className="font-display-lg text-headline-sm md:text-headline-md text-primary dark:text-primary-fixed-dim tracking-tighter flex-shrink-0"
+            className="font-display-lg text-headline-sm md:text-headline-md text-primary dark:text-primary-fixed-dim tracking-tighter flex-shrink-0 flex items-center gap-2"
           >
-            Restifashop
+            <Image
+              src="/logo.svg"
+              alt="Restifashop Logo"
+              width={28}
+              height={28}
+              className="object-contain"
+            />
+            <span>Restifashop</span>
           </Link>
         </div>
 

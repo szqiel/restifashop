@@ -345,10 +345,17 @@ export default function AdminDashboardContent({
         <div className="mx-auto flex h-20 max-w-container-max items-center justify-between px-margin-mobile md:px-margin-desktop">
           <Link
             href="/ibu-restifashop-dashboard"
-            className="font-serif text-headline-sm md:text-headline-md tracking-tight text-on-surface hover:opacity-85 transition-opacity flex items-center"
+            className="font-serif text-headline-sm md:text-headline-md tracking-tight text-on-surface hover:opacity-85 transition-opacity flex items-center gap-2"
           >
-            Restifashop{" "}
-            <span className="font-sans text-[9px] uppercase font-bold tracking-widest text-on-surface-variant/70 border border-outline-variant rounded-md px-2 py-0.5 ml-2.5">
+            <Image
+              src="/logo.svg"
+              alt="Restifashop Logo"
+              width={26}
+              height={26}
+              className="object-contain"
+            />
+            <span>Restifashop</span>
+            <span className="font-sans text-[9px] uppercase font-bold tracking-widest text-on-surface-variant/70 border border-outline-variant rounded-md px-2 py-0.5 ml-1">
               Dashboard
             </span>
           </Link>
