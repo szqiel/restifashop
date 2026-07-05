@@ -6,7 +6,7 @@ import { HelpCircle } from "lucide-react";
 import ShopFilters from "./ShopFilters";
 import { unstable_cache } from "next/cache";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;

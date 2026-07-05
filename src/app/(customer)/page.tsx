@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { Product } from "@/types";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 // Server-side fetching for home page products
 async function getFeaturedProducts(): Promise<Product[]> {
