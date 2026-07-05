@@ -198,9 +198,10 @@ export default async function ShopPage({ searchParams }: PageProps) {
                       </p>
                       <Link
                         href="/shop?category=bedcover"
-                        className="bg-primary-container text-on-primary-container px-4 py-2 font-label-caps text-label-caps hover:bg-primary hover:text-on-primary transition-colors duration-200 rounded inline-block text-xs uppercase"
+                        className="bg-primary-container text-on-primary-container px-4 py-2 font-label-caps text-label-caps hover:bg-primary hover:text-on-primary transition-all duration-300 rounded inline-block text-xs uppercase relative overflow-hidden group"
                       >
-                        Lihat Koleksi
+                        <span className="relative z-10">Lihat Koleksi</span>
+                        <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
                       </Link>
                     </div>
                   </div>

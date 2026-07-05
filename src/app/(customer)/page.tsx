@@ -45,10 +45,13 @@ export default async function HomePage() {
             </p>
             <Link
               href="/shop"
-              className="inline-flex items-center justify-center bg-primary-container text-on-primary-container font-label-caps text-label-caps px-8 py-4 rounded-xl hover:scale-95 transition-transform duration-300 shadow-[0_4px_14px_0_rgba(212,175,55,0.39)] uppercase tracking-wider"
+              className="inline-flex items-center justify-center bg-primary-container text-on-primary-container font-label-caps text-label-caps px-8 py-4 rounded-xl hover:scale-95 transition-all duration-300 shadow-[0_4px_14px_0_rgba(212,175,55,0.39)] uppercase tracking-wider relative overflow-hidden group"
             >
-              Beli Sekarang
-              <ArrowRight className="ml-2 h-4 w-4" />
+              <span className="relative z-10 flex items-center justify-center">
+                Beli Sekarang
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </span>
+              <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
             </Link>
           </div>
           {/* Image Content (7 cols) */}
