@@ -46,7 +46,7 @@ export default function HeroCarousel({ products }: HeroCarouselProps) {
             </div>
 
             {/* Light/Gold Gradient Overlay - Shortened and moved to bottom */}
-            <div className="absolute inset-x-0 bottom-0 h-3/4 md:h-2/3 bg-gradient-to-t from-surface via-surface/90 to-transparent"></div>
+            <div className="absolute inset-x-0 bottom-0 h-1/4 md:h-1/5 bg-gradient-to-t from-surface via-surface/90 to-transparent"></div>
 
             {/* Content */}
             <div className="absolute inset-0 max-w-container-max mx-auto px-margin-mobile md:px-gutter flex flex-col justify-end items-start text-left pb-24 md:pb-32">
