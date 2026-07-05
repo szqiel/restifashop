@@ -867,8 +867,6 @@ export default function AdminDashboardContent({
                 </div>
               </div>
               
-              </div>
-              
               <div className="mt-8 border-t border-outline-variant/20 pt-6">
                 <h3 className="font-serif text-body-lg font-bold text-on-surface mb-4">
                   Koleksi Beranda (3 Slot)
