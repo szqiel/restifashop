@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { Product } from "@/types";
 import { HelpCircle } from "lucide-react";
 import ShopFilters from "./ShopFilters";
+import { unstable_cache } from "next/cache";
 
 export const revalidate = 60;
 
@@ -11,45 +12,61 @@ interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-async function getProducts(params: {
-  category?: string;
-  search?: string;
-  sort?: string;
-}): Promise<Product[]> {
-  try {
-    const isPlaceholder = !process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder-url");
-    if (isPlaceholder) {
+// 1. Memory-cached product fetching (validated for 60 seconds)
+const getProductsCached = unstable_cache(
+  async (category: string, search: string, sort: string): Promise<Product[]> => {
+    try {
+      const isPlaceholder = !process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder-url");
+      if (isPlaceholder) {
+        return [];
+      }
+      let query = supabase.from("products").select("*");
+
+      if (category && category !== "all") {
+        query = query.eq("category", category);
+      }
+
+      if (search) {
+        query = query.ilike("name", `%${search}%`);
+      }
+
+      // Apply sorting
+      if (sort === "price-asc") {
+        query = query.order("price", { ascending: true });
+      } else if (sort === "price-desc") {
+        query = query.order("price", { ascending: false });
+      } else if (sort === "popular") {
+        query = query.order("sold_count", { ascending: false });
+      } else {
+        query = query.order("created_at", { ascending: false }); // newest
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data && data.length > 0 ? data : [];
+    } catch (err) {
+      console.error("Error fetching cached products:", err);
       return [];
     }
-    let query = supabase.from("products").select("*");
+  },
+  ["products-list"],
+  { revalidate: 60, tags: ["products"] }
+);
 
-    if (params.category && params.category !== "all") {
-      query = query.eq("category", params.category);
+// 2. Memory-cached categories list (validated for 5 minutes)
+const getCategoriesCached = unstable_cache(
+  async () => {
+    try {
+      const { data } = await supabase.from("products").select("category");
+      return data || [];
+    } catch (err) {
+      console.error("Error fetching cached categories:", err);
+      return [];
     }
-
-    if (params.search) {
-      query = query.ilike("name", `%${params.search}%`);
-    }
-
-    // Apply sorting
-    if (params.sort === "price-asc") {
-      query = query.order("price", { ascending: true });
-    } else if (params.sort === "price-desc") {
-      query = query.order("price", { ascending: false });
-    } else if (params.sort === "popular") {
-      query = query.order("sold_count", { ascending: false });
-    } else {
-      query = query.order("created_at", { ascending: false }); // newest
-    }
-
-    const { data, error } = await query;
-    if (error) throw error;
-    return data && data.length > 0 ? data : [];
-  } catch (err) {
-    console.error("Error fetching products:", err);
-    return [];
-  }
-}
+  },
+  ["products-categories"],
+  { revalidate: 300, tags: ["products"] }
+);
 
 export default async function ShopPage({ searchParams }: PageProps) {
   const params = await searchParams;
@@ -58,17 +75,11 @@ export default async function ShopPage({ searchParams }: PageProps) {
   const currentSort = (params.sort as string) || "newest";
   const focusSearch = params.focus === "search";
 
-  // 1. Fetch products
-  const products = await getProducts({
-    category: currentCategory,
-    search: currentSearch,
-    sort: currentSort,
-  });
-
-  // 2. Fetch all unique categories dynamically
-  const { data: allProducts } = await supabase
-    .from("products")
-    .select("category");
+  // Fetch products and categories in parallel using memory-cached Next.js data-cache
+  const [products, allProducts] = await Promise.all([
+    getProductsCached(currentCategory, currentSearch, currentSort),
+    getCategoriesCached()
+  ]);
 
   const categoriesList = ["sprei", "bedcover", "selimut", "aksesoris"];
   if (allProducts) {
