@@ -18,7 +18,6 @@ import {
   Plus,
   Trash2,
   Edit,
-  Image as ImageIcon,
   Upload,
 } from "lucide-react";
 import Link from "next/link";
@@ -225,7 +224,7 @@ export default function AdminDashboardContent({
     try {
       setUploadingImage(true);
       const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const fileName = `${crypto.randomUUID()}.${fileExt}`;
       const filePath = `${fileName}`;
 
       const { error: uploadError } = await supabase.storage
@@ -259,7 +258,7 @@ export default function AdminDashboardContent({
     try {
       setUploadingImage(true);
       const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const fileName = `${crypto.randomUUID()}.${fileExt}`;
       const filePath = `${fileName}`;
 
       const { error: uploadError } = await supabase.storage
@@ -935,7 +934,8 @@ export default function AdminDashboardContent({
                       { title: "Sprei", subtitle: "Koleksi Utama", image: "", link: "/shop?category=sprei", type: "tall" },
                       { title: "Selimut", subtitle: "Kenyamanan", image: "", link: "/shop?category=selimut", type: "standard" }
                     ];
-                    const colData = (Array.isArray(settings.home_collections) && settings.home_collections[idx]) || defaultCols[idx];
+                    const fallbackCols = defaultCols.map((col) => ({ ...col }));
+                    const colData = (Array.isArray(settings.home_collections) && settings.home_collections[idx]) || fallbackCols[idx];
 
                     return (
                       <div key={idx} className="bg-surface-bright p-4 rounded-xl border border-outline-variant/30 shadow-xs">
@@ -947,7 +947,9 @@ export default function AdminDashboardContent({
                               type="text" 
                               value={colData.title || ""} 
                               onChange={(e) => {
-                                const newCols = Array.isArray(settings.home_collections) ? [...settings.home_collections] : defaultCols;
+                                const newCols = Array.isArray(settings.home_collections)
+                                  ? [...settings.home_collections]
+                                  : defaultCols.map((col) => ({ ...col }));
                                 newCols[idx] = { ...newCols[idx], title: e.target.value };
                                 setSettings({ ...settings, home_collections: newCols });
                               }}
@@ -960,7 +962,9 @@ export default function AdminDashboardContent({
                               type="text" 
                               value={colData.subtitle || ""} 
                               onChange={(e) => {
-                                const newCols = Array.isArray(settings.home_collections) ? [...settings.home_collections] : defaultCols;
+                                const newCols = Array.isArray(settings.home_collections)
+                                  ? [...settings.home_collections]
+                                  : defaultCols.map((col) => ({ ...col }));
                                 newCols[idx] = { ...newCols[idx], subtitle: e.target.value };
                                 setSettings({ ...settings, home_collections: newCols });
                               }}
@@ -972,7 +976,9 @@ export default function AdminDashboardContent({
                             <select 
                               value={colData.link || ""} 
                               onChange={(e) => {
-                                const newCols = Array.isArray(settings.home_collections) ? [...settings.home_collections] : defaultCols;
+                                const newCols = Array.isArray(settings.home_collections)
+                                  ? [...settings.home_collections]
+                                  : defaultCols.map((col) => ({ ...col }));
                                 newCols[idx] = { ...newCols[idx], link: e.target.value };
                                 setSettings({ ...settings, home_collections: newCols });
                               }}
@@ -987,14 +993,24 @@ export default function AdminDashboardContent({
                           <div>
                             <label className="block text-[9px] font-bold text-on-surface-variant uppercase mb-1">Gambar</label>
                             <div className="flex gap-2">
-                              {colData.image && <img src={colData.image} alt="preview" className="h-9 w-9 object-cover rounded-md" />}
+                              {colData.image && (
+                                <Image
+                                  src={colData.image}
+                                  alt="preview"
+                                  width={36}
+                                  height={36}
+                                  className="h-9 w-9 rounded-md object-cover"
+                                />
+                              )}
                               <div className="relative flex-1">
                                 <input
                                   type="file"
                                   id={`file-col-${idx}`}
                                   accept="image/*"
                                   onChange={(e) => handleUploadSettingImage(e, (url) => {
-                                    const newCols = Array.isArray(settings.home_collections) ? [...settings.home_collections] : defaultCols;
+                                    const newCols = Array.isArray(settings.home_collections)
+                                      ? [...settings.home_collections]
+                                      : defaultCols.map((col) => ({ ...col }));
                                     newCols[idx] = { ...newCols[idx], image: url };
                                     setSettings({ ...settings, home_collections: newCols });
                                   })}
@@ -1062,7 +1078,15 @@ export default function AdminDashboardContent({
                           <div>
                             <label className="block text-[9px] font-bold text-on-surface-variant uppercase mb-1">Gambar Background</label>
                             <div className="flex gap-2">
-                              {banner.image && <img src={banner.image} alt="preview" className="h-10 w-16 object-cover rounded-md" />}
+                              {banner.image && (
+                                <Image
+                                  src={banner.image}
+                                  alt="preview"
+                                  width={64}
+                                  height={40}
+                                  className="h-10 w-16 rounded-md object-cover"
+                                />
+                              )}
                               <div className="relative flex-1">
                                 <input
                                   type="file"

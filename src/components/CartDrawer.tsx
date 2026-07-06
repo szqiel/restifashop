@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCartStore } from "@/store/useCartStore";
@@ -16,12 +16,6 @@ export default function CartDrawer() {
     getTotalPrice,
     setIsCheckoutOpen,
   } = useCartStore();
-
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Prevent scroll when cart is open
   useEffect(() => {
@@ -42,7 +36,7 @@ export default function CartDrawer() {
     setIsCheckoutOpen(true);
   };
 
-  const totalPrice = mounted ? getTotalPrice() : 0;
+  const totalPrice = getTotalPrice();
 
   return (
     <div className="fixed inset-0 z-modal flex justify-end">
@@ -53,7 +47,7 @@ export default function CartDrawer() {
       />
 
       {/* Cart Container */}
-      <div className="relative z-10 flex h-full w-full max-w-md flex-col bg-white shadow-xl animate-slide-in-right">
+      <div className="relative z-10 flex h-full w-full max-w-md flex-col bg-surface shadow-xl animate-slide-in-right border-l border-outline-variant/20">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-outline-variant/30 px-6 py-6">
           <h2 className="font-serif text-headline-md text-on-surface">Keranjang Belanja</h2>
@@ -67,14 +61,7 @@ export default function CartDrawer() {
 
         {/* Cart Items (Scrollable) */}
         <div className="flex-1 overflow-y-auto p-6 hide-scrollbar">
-          {!mounted ? (
-            // Skeleton Loader during hydration
-            <div className="flex flex-col gap-4">
-              {[1, 2].map((i) => (
-                <div key={i} className="h-24 w-full animate-pulse rounded-md bg-surface-dim" />
-              ))}
-            </div>
-          ) : items.length === 0 ? (
+          {items.length === 0 ? (
             // Empty State
             <div className="flex h-full flex-col items-center justify-center text-center py-12">
               <ShoppingBag className="h-16 w-16 text-secondary mb-4 stroke-[1.5]" />
@@ -85,7 +72,7 @@ export default function CartDrawer() {
               <Link
                 href="/shop"
                 onClick={() => setIsOpen(false)}
-                className="inline-block px-7 py-3.5 bg-on-surface text-surface font-label-caps text-label-caps rounded-xl hover:scale-95 transition-all btn-tactile uppercase tracking-wider"
+                className="gold-button inline-block rounded-xl bg-primary-container px-7 py-3.5 font-label-caps text-label-caps uppercase tracking-wider text-on-primary-container"
               >
                 Jelajahi Koleksi
               </Link>
@@ -159,8 +146,8 @@ export default function CartDrawer() {
         </div>
 
         {/* Footer Summary (Sticky bottom) */}
-        {mounted && items.length > 0 && (
-          <div className="border-t border-outline-variant/30 bg-white p-6 shadow-[0_-10px_20px_rgba(0,0,0,0.02)]">
+        {items.length > 0 && (
+          <div className="border-t border-outline-variant/30 bg-surface p-6 shadow-[0_-10px_20px_rgba(0,0,0,0.02)]">
             <div className="flex items-center justify-between mb-4">
               <span className="font-sans text-sm font-bold uppercase tracking-widest text-on-surface-variant">
                 Subtotal
@@ -176,14 +163,14 @@ export default function CartDrawer() {
             <div className="flex flex-col gap-3">
               <button
                 onClick={handleCheckoutClick}
-                className="w-full py-4 bg-on-surface text-surface py-4 px-6 rounded-full font-label-caps text-label-caps uppercase tracking-widest hover:bg-surface-tint transition-all duration-300 active:scale-[0.97] flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                className="gold-button w-full rounded-full bg-primary-container px-6 py-4 font-label-caps text-label-caps uppercase tracking-widest text-on-primary-container flex items-center justify-center gap-2 shadow-sm cursor-pointer"
               >
                 <span>Lanjutkan ke Checkout</span>
                 <ArrowRight className="h-4.5 w-4.5" />
               </button>
               <button
                 onClick={() => setIsOpen(false)}
-                className="w-full py-3.5 border border-outline-variant text-on-surface-variant font-label-caps text-label-caps rounded-full tracking-widest uppercase hover:bg-surface-dim transition-colors btn-tactile cursor-pointer"
+                className="w-full rounded-full border border-outline-variant px-6 py-3.5 font-label-caps text-label-caps uppercase tracking-widest text-on-surface-variant hover:bg-surface-dim transition-colors btn-tactile cursor-pointer"
               >
                 Kembali Belanja
               </button>

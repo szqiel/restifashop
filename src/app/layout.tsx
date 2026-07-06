@@ -30,7 +30,7 @@ export default function RootLayout({
       lang="id"
       className={`${libreCaslon.variable} ${dmSans.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-primary-bg text-text-primary">
+      <body className="min-h-full flex flex-col bg-background text-on-background">
         {children}
       </body>
     </html>

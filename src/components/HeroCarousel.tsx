@@ -24,7 +24,7 @@ export default function HeroCarousel({ products }: HeroCarouselProps) {
   if (!products || products.length === 0) return null;
 
   return (
-    <section className="relative w-full h-[500px] md:h-[700px] overflow-hidden">
+    <section className="relative w-full min-h-[560px] md:min-h-[760px] overflow-hidden bg-surface">
       {products.map((product, index) => {
         const isActive = index === currentIndex;
         return (
@@ -34,7 +34,6 @@ export default function HeroCarousel({ products }: HeroCarouselProps) {
               isActive ? "opacity-100 z-10" : "opacity-0 z-0"
             }`}
           >
-            {/* Background Image */}
             <div className="absolute inset-0 w-full h-full">
               <Image
                 src={product.images?.[0] || "/images/placeholder.jpg"}
@@ -42,19 +41,16 @@ export default function HeroCarousel({ products }: HeroCarouselProps) {
                 fill
                 priority={index === 0}
                 className="object-cover object-center md:object-right"
-                quality={100}
+                sizes="100vw"
+                quality={95}
               />
             </div>
-            {/* IDLIX-Style Left Gradient for Text Readability */}
-            <div className="absolute inset-0 w-full md:w-3/4 bg-gradient-to-r from-surface via-surface/95 to-transparent"></div>
-            
-            {/* Subtle Bottom Gradient to blend with next section */}
-            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-surface to-transparent"></div>
+            <div className="absolute inset-0 w-full md:w-3/4 bg-gradient-to-r from-surface via-surface/94 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-surface to-transparent" />
 
-            {/* Content */}
-            <div className="absolute inset-0 max-w-container-max mx-auto px-margin-mobile md:px-gutter flex flex-col justify-center items-start text-left z-10">
-              <div className="md:w-1/2 space-y-6">
-                <div className="inline-block px-3 py-1 bg-primary/10 border border-primary/20 rounded-full font-sans font-bold text-[10px] uppercase tracking-widest text-primary mb-2">
+            <div className="section-shell absolute inset-0 flex items-center justify-start text-left z-10">
+              <div className="max-w-2xl space-y-6 py-16 md:py-24 md:w-1/2">
+                <div className="inline-block rounded-full border border-primary/20 bg-primary/10 px-3 py-1 font-sans text-[10px] font-bold uppercase tracking-widest text-primary">
                   Koleksi Terbaru
                 </div>
                 <h1 className="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-surface leading-tight tracking-tighter">
@@ -66,13 +62,13 @@ export default function HeroCarousel({ products }: HeroCarouselProps) {
                 <div className="pt-2">
                   <Link
                     href={`/product/${product.id}`}
-                    className="inline-flex items-center justify-center bg-primary-container text-on-primary-container font-label-caps text-label-caps px-10 py-4 md:px-12 rounded-xl hover:scale-95 transition-all duration-300 shadow-[0_4px_14px_0_rgba(212,175,55,0.39)] uppercase tracking-widest relative overflow-hidden group"
+                    className="gold-button inline-flex items-center justify-center rounded-xl bg-primary-container px-10 py-4 md:px-12 font-label-caps text-label-caps text-on-primary-container uppercase tracking-widest shadow-[0_4px_14px_0_rgba(212,175,55,0.28)] relative overflow-hidden group"
                   >
                     <span className="relative z-10 flex items-center justify-center">
                       Beli Sekarang
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </span>
-                    <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
+                    <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
                   </Link>
                 </div>
               </div>
@@ -81,13 +77,13 @@ export default function HeroCarousel({ products }: HeroCarouselProps) {
         );
       })}
 
-      {/* Dots Indicator */}
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes progressFill {
           from { width: 0%; }
           to { width: 100%; }
         }
-      `}} />
+      ` }} />
+
       <div className="absolute bottom-8 left-0 right-0 z-20 flex justify-center gap-3">
         {products.map((_, index) => {
           const isActive = index === currentIndex;
@@ -103,8 +99,8 @@ export default function HeroCarousel({ products }: HeroCarouselProps) {
               aria-label={`Go to slide ${index + 1}`}
             >
               {isActive && (
-                <div 
-                  key={currentIndex} /* Key forces re-render of animation when index changes */
+                <div
+                  key={currentIndex}
                   className="absolute top-0 left-0 h-full bg-primary"
                   style={{ animation: "progressFill 7s linear forwards" }}
                 />

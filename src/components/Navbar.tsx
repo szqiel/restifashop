@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -12,10 +12,7 @@ export default function Navbar() {
   const { setIsOpen, getTotalItems } = useCartStore();
   const pathname = usePathname();
 
-  const [mounted, setMounted] = useState(false);
   useEffect(() => {
-    setMounted(true);
-
     const handleStorageChange = (event: StorageEvent) => {
       if (event.key === "cart-storage") {
         useCartStore.persist.rehydrate();
@@ -28,7 +25,7 @@ export default function Navbar() {
     };
   }, []);
 
-  const cartCount = mounted ? getTotalItems() : 0;
+  const cartCount = getTotalItems();
 
   const navLinks = [
     { name: "Collections", href: "/shop" },
@@ -38,8 +35,8 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-outline-variant/30 bg-surface/95 backdrop-blur-md transition-all duration-300">
-      <div className="flex justify-between items-center px-margin-mobile md:px-margin-desktop py-unit w-full max-w-container-max mx-auto h-24 relative">
+    <header className="sticky top-0 z-50 w-full border-b border-outline-variant/30 bg-surface/90 backdrop-blur-xl transition-all duration-300">
+      <div className="section-shell flex h-24 items-center justify-between relative">
         {/* Mobile menu and Brand Logo left-aligned */}
         <div className="flex items-center gap-2">
           {/* Mobile Menu Button (Hamburger) */}
@@ -57,7 +54,7 @@ export default function Navbar() {
           {/* Brand Logo & Name */}
           <Link
             href="/"
-            className="font-display-lg text-headline-sm md:text-headline-md text-primary dark:text-primary-fixed-dim tracking-tighter flex-shrink-0 flex items-center gap-2"
+            className="font-display-lg text-headline-sm md:text-headline-md text-primary tracking-tighter flex-shrink-0 flex items-center gap-2"
           >
             <Image
               src="/logo.svg"
@@ -71,7 +68,7 @@ export default function Navbar() {
         </div>
 
         {/* Center: Navigation Links (Desktop) */}
-        <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-gutter font-body-md text-body-md uppercase tracking-wider">
+        <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-8 font-body-md text-body-md uppercase tracking-wider">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
@@ -91,25 +88,23 @@ export default function Navbar() {
         </nav>
 
         {/* Right: Trailing Icons */}
-        <div className="flex items-center gap-element-gap text-primary dark:text-primary-fixed-dim">
+        <div className="flex items-center gap-1 text-primary">
           {/* Search */}
           <Link
             href="/shop?focus=search"
-            className="p-2 hover:opacity-80 transition-opacity active:scale-95 duration-150 flex items-center justify-center"
+            className="p-2 hover:opacity-80 transition-all active:scale-95 duration-150 flex items-center justify-center"
           >
             <Search className="h-6 w-6 stroke-[1.5]" />
           </Link>
 
-
-
           {/* Shopping Bag */}
           <button
             onClick={() => setIsOpen(true)}
-            className="p-2 hover:opacity-80 transition-opacity active:scale-95 duration-150 flex items-center justify-center relative"
+            className="p-2 hover:opacity-80 transition-all active:scale-95 duration-150 flex items-center justify-center relative"
           >
             <ShoppingBag className="h-6 w-6 stroke-[1.5]" />
             {cartCount > 0 && (
-              <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[9px] font-bold text-white">
+              <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary-container px-1 text-[9px] font-bold text-on-primary-container">
                 {cartCount}
               </span>
             )}
@@ -119,13 +114,13 @@ export default function Navbar() {
 
       {/* Mobile Navigation Drawer */}
       {isMobileMenuOpen && (
-        <div className="absolute top-24 left-0 w-full bg-surface border-b border-outline-variant/30 shadow-md md:hidden animate-fade-in z-50">
+        <div className="absolute top-24 left-0 w-full bg-surface/98 border-b border-outline-variant/30 shadow-md md:hidden animate-fade-in z-50">
           <nav className="flex flex-col py-4">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
-                className="px-margin-mobile py-4 font-sans text-xs font-bold uppercase tracking-widest text-text-secondary hover:bg-surface-dim hover:text-accent border-b border-border-custom/20 last:border-0"
+                className="px-margin-mobile py-4 font-sans text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-dim hover:text-primary border-b border-outline-variant/20 last:border-0"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {link.name}

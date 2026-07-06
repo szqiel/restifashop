@@ -9,6 +9,7 @@ export async function middleware(request: NextRequest) {
   });
 
   let user = null;
+  let isAdmin = false;
   const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseUrl = (rawUrl && rawUrl.startsWith("http")) ? rawUrl : null;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -40,6 +41,7 @@ export async function middleware(request: NextRequest) {
 
       const { data } = await supabase.auth.getUser();
       user = data.user;
+      isAdmin = user?.user_metadata?.role === "admin";
     } catch (err) {
       console.error("Middleware Supabase auth check failed:", err);
     }
@@ -49,7 +51,7 @@ export async function middleware(request: NextRequest) {
 
   if (pathname.startsWith("/ibu-restifashop-dashboard")) {
     // 1. If not logged in and trying to access admin dashboard, redirect to login
-    if (!user) {
+    if (!isAdmin) {
       const url = request.nextUrl.clone();
       url.pathname = "/ibu-restifashop";
       return NextResponse.redirect(url);
@@ -58,7 +60,7 @@ export async function middleware(request: NextRequest) {
 
   if (pathname === "/ibu-restifashop") {
     // 2. If logged in and trying to access login page, redirect to dashboard
-    if (user) {
+    if (isAdmin) {
       const url = request.nextUrl.clone();
       url.pathname = "/ibu-restifashop-dashboard";
       return NextResponse.redirect(url);

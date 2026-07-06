@@ -5,12 +5,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { Product } from "@/types";
 import { useCartStore } from "@/store/useCartStore";
-import { ChevronDown, ArrowRight, Check, ShoppingBag, X } from "lucide-react";
+import { ChevronDown, ArrowRight, Check, X } from "lucide-react";
 
 interface ProductDetailContentProps {
   product: Product;
   relatedProducts: Product[];
-  storeSettings?: any;
+  storeSettings?: {
+    shipping_info?: string;
+    return_info?: string;
+  } | null;
 }
 
 export default function ProductDetailContent({
@@ -55,8 +58,7 @@ export default function ProductDetailContent({
     if (name.includes("brown") || name.includes("cokelat") || name.includes("coklat")) return "#78350f";
     if (name.includes("gold") || name.includes("emas")) return "#d4af37";
     
-    // Fallback: If it's a single word, try to use it directly in CSS, otherwise default to gold accent
-    return colorName; 
+    return colorName;
   };
 
   const handleAddToCart = () => {
@@ -113,14 +115,15 @@ export default function ProductDetailContent({
         {/* Left Column: Image Gallery */}
         <div className="md:col-span-7 flex flex-col gap-4">
           <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden bg-surface-container-low border border-outline-variant/20 shadow-xs">
-            <Image
-              src={product.images[activeImageIndex] || "https://via.placeholder.com/600x800"}
-              alt={product.name}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 55vw"
-              priority
-             quality={95} />
+              <Image
+                src={product.images[activeImageIndex] || "https://via.placeholder.com/600x800"}
+                alt={product.name}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 55vw"
+                priority
+                quality={95}
+              />
           </div>
           {product.images.length > 1 && (
             <div className="flex gap-4">
@@ -140,7 +143,8 @@ export default function ProductDetailContent({
                     fill
                     className="object-cover"
                     sizes="80px"
-                   quality={95} />
+                    quality={90}
+                  />
                 </button>
               ))}
             </div>
@@ -251,7 +255,7 @@ export default function ProductDetailContent({
           <button
             onClick={handleAddToCart}
             disabled={product.stock === 0}
-            className="w-full bg-on-surface text-surface py-4 px-6 rounded-full font-label-caps text-label-caps uppercase tracking-widest hover:bg-surface-tint transition-all duration-300 active:scale-[0.97] flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+            className="gold-button w-full rounded-full bg-primary-container px-6 py-4 font-label-caps text-label-caps uppercase tracking-widest text-on-primary-container active:scale-[0.97] flex items-center justify-center gap-2 shadow-sm cursor-pointer"
           >
             <span>{addedToCart ? "Dimasukkan ke Keranjang" : "Tambah ke Keranjang"}</span>
             <ArrowRight className="h-4.5 w-4.5" />
@@ -260,7 +264,7 @@ export default function ProductDetailContent({
           <button
             onClick={handleWhatsAppCheckout}
             disabled={product.stock === 0}
-            className="w-full bg-primary-container text-on-primary-container py-4 px-6 rounded-full font-label-caps text-label-caps uppercase tracking-widest hover:bg-primary hover:text-on-primary transition-all duration-300 active:scale-[0.97] flex items-center justify-center gap-2 relative overflow-hidden group cursor-pointer"
+            className="gold-button w-full rounded-full bg-primary-container px-6 py-4 font-label-caps text-label-caps uppercase tracking-widest text-on-primary-container active:scale-[0.97] flex items-center justify-center gap-2 relative overflow-hidden group cursor-pointer"
           >
             <span className="relative z-10 flex items-center gap-2">
               <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -309,6 +313,53 @@ export default function ProductDetailContent({
       </div>
     </div>
 
+    {relatedProducts.length > 0 && (
+      <div className="mt-16 border-t border-outline-variant/20 pt-12">
+        <div className="mb-6 flex items-end justify-between gap-4">
+          <div>
+            <p className="mb-2 font-label-caps text-label-caps uppercase tracking-widest text-primary">
+              Related Pieces
+            </p>
+            <h2 className="font-serif text-headline-md text-on-surface">Pasangkan dengan koleksi lain</h2>
+          </div>
+          <Link href="/shop" className="hidden text-sm font-bold uppercase tracking-widest text-secondary transition-colors hover:text-primary md:block">
+            Lihat semua
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {relatedProducts.map((related) => (
+            <Link
+              key={related.id}
+              href={`/product/${related.id}`}
+              className="group block overflow-hidden rounded-2xl border border-outline-variant/20 bg-surface-container-low shadow-xs"
+            >
+              <div className="relative aspect-[4/5] overflow-hidden">
+                <Image
+                  src={related.images[0] || "https://via.placeholder.com/400x500?text=Related"}
+                  alt={related.name}
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                  sizes="(max-width: 768px) 100vw, 25vw"
+                  quality={90}
+                />
+              </div>
+              <div className="p-4">
+                <p className="mb-1 font-label-caps text-[10px] uppercase tracking-widest text-primary">
+                  {related.category}
+                </p>
+                <h3 className="line-clamp-1 font-body-lg text-body-lg text-on-surface group-hover:text-primary transition-colors">
+                  {related.name}
+                </h3>
+                <p className="mt-2 font-body-md text-sm text-secondary">
+                  Rp {related.price.toLocaleString("id-ID")}
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    )}
+
     {/* Size Guide Modal */}
       {isSizeGuideOpen && (
         <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
@@ -316,7 +367,7 @@ export default function ProductDetailContent({
             className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-300"
             onClick={() => setIsSizeGuideOpen(false)}
           />
-          <div className="relative z-10 w-full max-w-md rounded-2xl bg-white p-6 md:p-8 border border-outline-variant/30 shadow-xl animate-scale-up text-left">
+          <div className="surface-panel relative z-10 w-full max-w-md rounded-2xl p-6 md:p-8 text-left shadow-xl animate-scale-up">
             <button
               onClick={() => setIsSizeGuideOpen(false)}
               className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full hover:bg-surface-variant/40 text-on-surface-variant cursor-pointer"
@@ -371,7 +422,7 @@ export default function ProductDetailContent({
             
             <button
               onClick={() => setIsSizeGuideOpen(false)}
-              className="mt-6 w-full py-3 bg-on-surface text-surface font-sans font-bold text-label rounded-full tracking-widest uppercase hover:bg-surface-tint transition-all cursor-pointer"
+              className="gold-button mt-6 w-full rounded-full bg-primary-container py-3 font-sans font-bold text-label uppercase tracking-widest text-on-primary-container cursor-pointer"
             >
               Tutup
             </button>
