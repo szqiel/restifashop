@@ -1132,7 +1132,7 @@ export default function AdminDashboardContent({
 
       {/* Order Detail Modal */}
       {selectedOrder && (
-        <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
           <div
             className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-300"
             onClick={() => setSelectedOrder(null)}
@@ -1279,7 +1279,7 @@ export default function AdminDashboardContent({
 
       {/* Add Product Modal */}
       {isAddProductOpen && (
-        <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
           <div
             className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-300"
             onClick={() => setIsAddProductOpen(false)}
@@ -1543,7 +1543,7 @@ export default function AdminDashboardContent({
       )}
       {/* Confirmation Modal */}
       {confirmDialog.isOpen && (
-        <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
           <div
             className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-300"
             onClick={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}

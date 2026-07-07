@@ -158,25 +158,31 @@ export default function ProductDetailContent({
             <span className="block font-sans font-bold text-[10px] text-primary uppercase tracking-widest">
               {product.category}
             </span>
-            <h1 className="font-serif text-display-xs text-on-background tracking-tight">
+            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-on-background tracking-tight leading-[1.1]">
               {product.name}
             </h1>
             <div className="flex items-center gap-3">
-              <span className="font-serif text-headline-lg text-primary">
+              <span className="font-serif text-2xl md:text-3xl text-on-background">
                 Rp {discountedPrice.toLocaleString("id-ID")}
               </span>
               {product.discount_percentage > 0 && (
-                <>
+                <div className="flex items-center gap-2">
                   <span className="font-sans text-xs text-secondary line-through">
                     Rp {product.price.toLocaleString("id-ID")}
                   </span>
                   <span className="font-sans text-xs font-bold text-error bg-error/10 px-2 py-0.5 rounded">
                     Save {product.discount_percentage}%
                   </span>
-                </>
+                </div>
               )}
             </div>
           </div>
+
+          {product.description && (
+            <div className="font-body-md text-on-surface-variant leading-relaxed whitespace-pre-wrap mt-2">
+              {product.description}
+            </div>
+          )}
 
           <hr className="border-outline-variant/30" />
 
@@ -255,7 +261,7 @@ export default function ProductDetailContent({
           <button
             onClick={handleAddToCart}
             disabled={product.stock === 0}
-            className="gold-button w-full rounded-full bg-primary-container px-6 py-4 font-label-caps text-label-caps uppercase tracking-widest text-on-primary-container active:scale-[0.97] flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+            className="w-full rounded-full bg-black hover:bg-[#735c00] transition-colors duration-300 px-6 py-4 font-label-caps text-label-caps uppercase tracking-widest text-white active:scale-[0.97] flex items-center justify-center gap-2 shadow-sm cursor-pointer disabled:opacity-50"
           >
             <span>{addedToCart ? "Dimasukkan ke Keranjang" : "Tambah ke Keranjang"}</span>
             <ArrowRight className="h-4.5 w-4.5" />
@@ -362,7 +368,7 @@ export default function ProductDetailContent({
 
     {/* Size Guide Modal */}
       {isSizeGuideOpen && (
-        <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
           <div
             className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-300"
             onClick={() => setIsSizeGuideOpen(false)}

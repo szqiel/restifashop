@@ -104,15 +104,15 @@ export default function CheckoutModal() {
 
       // Redirect customer to Order Confirmation Page
       router.push(`/order-confirmation?orderNumber=${order_number}`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Koneksi bermasalah. Silakan coba lagi.");
+    } catch (err: any) {
+      setError(err.message || "Koneksi bermasalah. Silakan coba lagi.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-300 animate-fade-in"
@@ -120,20 +120,17 @@ export default function CheckoutModal() {
       />
 
       {/* Modal Dialog */}
-      <div className="surface-panel relative z-10 w-full max-w-lg rounded-2xl p-6 md:p-8 shadow-xl animate-scale-up max-h-[90vh] overflow-y-auto hide-scrollbar">
+      <div className="relative z-10 w-full max-w-lg rounded-lg bg-white p-6 md:p-8 shadow-xl animate-scale-up max-h-[90vh] overflow-y-auto hide-scrollbar">
         {/* Close Button */}
         <button
           onClick={() => setIsCheckoutOpen(false)}
           disabled={loading}
-          className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full text-text-secondary hover:bg-surface-dim disabled:opacity-50 btn-tactile"
+          className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full hover:bg-surface-dim text-text-secondary disabled:opacity-50 btn-tactile"
         >
           <X className="h-5 w-5" />
         </button>
 
-        <div className="mb-6">
-          <p className="mb-2 font-label-caps text-label-caps uppercase tracking-widest text-primary">Checkout</p>
-          <h2 className="font-serif text-h1 text-text-primary">Informasi Pengiriman</h2>
-        </div>
+        <h2 className="font-serif text-h1 text-text-primary mb-6">Informasi Pengiriman</h2>
 
         {error && (
           <div className="flex items-center gap-2 rounded-md bg-error/10 p-4 text-xs font-semibold text-error mb-6">
@@ -155,7 +152,7 @@ export default function CheckoutModal() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="cth: Syair Adharian"
-            className="w-full rounded-xl border border-outline-variant bg-surface px-4 py-3 font-sans text-sm text-on-surface placeholder:text-text-muted transition-all focus:border-primary focus:outline-none shadow-2xs"
+              className="w-full px-4 py-3 bg-surface border border-outline-variant rounded-lg font-sans text-sm text-on-surface placeholder:text-text-muted focus:border-primary focus:outline-none transition-all shadow-2xs"
             />
           </div>
 
@@ -171,7 +168,7 @@ export default function CheckoutModal() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="cth: 08123456789"
-            className="w-full rounded-xl border border-outline-variant bg-surface px-4 py-3 font-sans text-sm text-on-surface placeholder:text-text-muted transition-all focus:border-primary focus:outline-none shadow-2xs"
+              className="w-full px-4 py-3 bg-surface border border-outline-variant rounded-lg font-sans text-sm text-on-surface placeholder:text-text-muted focus:border-primary focus:outline-none transition-all shadow-2xs"
             />
           </div>
 
@@ -187,7 +184,7 @@ export default function CheckoutModal() {
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder="cth: Jalan Melati No. 12, RT 03/RW 04, Kec. Gajahmungkur, Kota Semarang"
-            className="w-full resize-none rounded-xl border border-outline-variant bg-surface px-4 py-3 font-sans text-sm text-on-surface placeholder:text-text-muted transition-all focus:border-primary focus:outline-none shadow-2xs"
+              className="w-full px-4 py-3 bg-surface border border-outline-variant rounded-lg font-sans text-sm text-on-surface placeholder:text-text-muted focus:border-primary focus:outline-none transition-all shadow-2xs resize-none"
             />
           </div>
 
@@ -202,16 +199,16 @@ export default function CheckoutModal() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="cth: siti@example.com"
-            className="w-full rounded-xl border border-outline-variant bg-surface px-4 py-3 font-sans text-sm text-on-surface placeholder:text-text-muted transition-all focus:border-primary focus:outline-none shadow-2xs"
+              className="w-full px-4 py-3 bg-surface border border-outline-variant rounded-lg font-sans text-sm text-on-surface placeholder:text-text-muted focus:border-primary focus:outline-none transition-all shadow-2xs"
             />
           </div>
 
           {/* Order Summary */}
-          <div className="rounded-2xl border border-outline-variant/30 bg-surface-dim p-4 mt-2">
+          <div className="rounded-md border border-border-custom/50 bg-surface-dim p-4 mt-2">
             <h3 className="font-serif text-body-md text-text-primary mb-3 font-semibold">
               Ringkasan Pesanan
             </h3>
-            <div className="flex flex-col gap-2 max-h-28 overflow-y-auto hide-scrollbar">
+            <div className="flex flex-col gap-2 max-h-24 overflow-y-auto hide-scrollbar">
               {items.map((item) => (
                 <div key={item.variantId} className="flex justify-between text-xs text-text-secondary">
                   <span className="line-clamp-1 max-w-[260px]">
@@ -221,7 +218,7 @@ export default function CheckoutModal() {
                 </div>
               ))}
             </div>
-            <div className="border-t border-outline-variant/30 pt-3 mt-3 flex justify-between font-sans text-sm font-bold text-text-primary">
+            <div className="border-t border-border-custom/50 pt-3 mt-3 flex justify-between font-sans text-sm font-bold text-text-primary">
               <span>Subtotal</span>
               <span className="text-primary text-base font-bold">
                 Rp {totalPrice.toLocaleString("id-ID")}
@@ -237,7 +234,7 @@ export default function CheckoutModal() {
             <button
               type="submit"
               disabled={loading}
-              className="gold-button flex-grow rounded-full bg-primary-container py-4 font-label-caps text-label-caps uppercase tracking-widest text-on-primary-container disabled:opacity-50 flex items-center justify-center gap-2 btn-tactile cursor-pointer"
+              className="flex-grow py-4 bg-on-surface text-surface font-label-caps text-label-caps rounded-full uppercase tracking-widest hover:bg-surface-tint transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 btn-tactile cursor-pointer"
             >
               <Send className="h-4 w-4" />
               {loading ? "Memproses..." : "Konfirmasi & Kirim WA"}
@@ -246,7 +243,7 @@ export default function CheckoutModal() {
               type="button"
               disabled={loading}
               onClick={() => setIsCheckoutOpen(false)}
-              className="rounded-full border border-outline-variant px-6 py-4 font-label-caps text-label-caps uppercase tracking-widest text-on-surface-variant hover:bg-surface-dim transition-colors disabled:opacity-50 btn-tactile cursor-pointer"
+              className="py-4 px-6 border border-outline-variant text-on-surface-variant font-label-caps text-label-caps rounded-full tracking-widest uppercase hover:bg-surface-dim transition-colors disabled:opacity-50 btn-tactile cursor-pointer"
             >
               Batal
             </button>

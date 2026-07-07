@@ -12,7 +12,10 @@ export default function Navbar() {
   const { setIsOpen, getTotalItems } = useCartStore();
   const pathname = usePathname();
 
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
+    setMounted(true);
     const handleStorageChange = (event: StorageEvent) => {
       if (event.key === "cart-storage") {
         useCartStore.persist.rehydrate();
@@ -25,7 +28,7 @@ export default function Navbar() {
     };
   }, []);
 
-  const cartCount = getTotalItems();
+  const cartCount = mounted ? getTotalItems() : 0;
 
   const navLinks = [
     { name: "Collections", href: "/shop" },
