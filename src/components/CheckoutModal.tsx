@@ -7,11 +7,13 @@ import { useRouter } from "next/navigation";
 
 export default function CheckoutModal() {
   const {
-    items,
+    items: cartItems,
     isCheckoutOpen,
     setIsCheckoutOpen,
     getTotalPrice,
     clearCart,
+    directCheckoutItem,
+    setDirectCheckoutItem,
   } = useCartStore();
 
   const router = useRouter();
@@ -23,6 +25,9 @@ export default function CheckoutModal() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const items = directCheckoutItem ? [directCheckoutItem] : cartItems;
+  const totalPrice = directCheckoutItem ? directCheckoutItem.price * directCheckoutItem.quantity : getTotalPrice();
 
   useEffect(() => {
     if (isCheckoutOpen) {
@@ -36,8 +41,6 @@ export default function CheckoutModal() {
   }, [isCheckoutOpen]);
 
   if (!isCheckoutOpen) return null;
-
-  const totalPrice = getTotalPrice();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -116,14 +119,22 @@ export default function CheckoutModal() {
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-300 animate-fade-in"
-        onClick={() => !loading && setIsCheckoutOpen(false)}
+        onClick={() => {
+          if (!loading) {
+            setIsCheckoutOpen(false);
+            setDirectCheckoutItem(null);
+          }
+        }}
       />
 
       {/* Modal Dialog */}
       <div className="relative z-10 w-full max-w-lg rounded-lg bg-white p-6 md:p-8 shadow-xl animate-scale-up max-h-[90vh] overflow-y-auto hide-scrollbar">
         {/* Close Button */}
         <button
-          onClick={() => setIsCheckoutOpen(false)}
+          onClick={() => {
+            setIsCheckoutOpen(false);
+            setDirectCheckoutItem(null);
+          }}
           disabled={loading}
           className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full hover:bg-surface-dim text-text-secondary disabled:opacity-50 btn-tactile"
         >
@@ -242,7 +253,10 @@ export default function CheckoutModal() {
             <button
               type="button"
               disabled={loading}
-              onClick={() => setIsCheckoutOpen(false)}
+              onClick={() => {
+                setIsCheckoutOpen(false);
+                setDirectCheckoutItem(null);
+              }}
               className="py-4 px-6 border border-outline-variant text-on-surface-variant font-label-caps text-label-caps rounded-full tracking-widest uppercase hover:bg-surface-dim transition-colors disabled:opacity-50 btn-tactile cursor-pointer"
             >
               Batal

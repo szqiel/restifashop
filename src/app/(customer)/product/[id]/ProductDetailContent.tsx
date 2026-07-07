@@ -21,7 +21,7 @@ export default function ProductDetailContent({
   relatedProducts,
   storeSettings,
 }: ProductDetailContentProps) {
-  const { addItem, setIsOpen, setIsCheckoutOpen } = useCartStore();
+  const { addItem, setIsOpen, setIsCheckoutOpen, setDirectCheckoutItem } = useCartStore();
 
   const colors = product.colors.length > 0 ? product.colors : ["Standard"];
   const sizes = product.sizes.length > 0 ? product.sizes : ["Standard"];
@@ -85,8 +85,8 @@ export default function ProductDetailContent({
   const handleWhatsAppCheckout = () => {
     const variantId = `${product.id}-${selectedColor}-${selectedSize}`;
     
-    // 1. Add to cart
-    addItem({
+    // Set direct checkout item bypassing the cart
+    setDirectCheckoutItem({
       productId: product.id,
       variantId,
       name: product.name,
@@ -97,7 +97,7 @@ export default function ProductDetailContent({
       image: product.images[0] || "",
     });
     
-    // 2. Open Checkout Form modal directly
+    // Open Checkout Form modal directly
     setIsCheckoutOpen(true);
   };
 

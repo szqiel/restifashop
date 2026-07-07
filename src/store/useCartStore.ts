@@ -14,6 +14,8 @@ interface CartState {
   clearCart: () => void;
   getTotalItems: () => number;
   getTotalPrice: () => number;
+  directCheckoutItem: CartItem | null;
+  setDirectCheckoutItem: (item: CartItem | null) => void;
 }
 
 export const useCartStore = create<CartState>()(
@@ -24,6 +26,8 @@ export const useCartStore = create<CartState>()(
       setIsOpen: (isOpen) => set({ isOpen }),
       isCheckoutOpen: false,
       setIsCheckoutOpen: (isCheckoutOpen) => set({ isCheckoutOpen }),
+      directCheckoutItem: null,
+      setDirectCheckoutItem: (directCheckoutItem) => set({ directCheckoutItem }),
       addItem: (item) => {
         const currentItems = get().items;
         const existingItemIndex = currentItems.findIndex(
