@@ -19,6 +19,7 @@ import {
   Trash2,
   Edit,
   Upload,
+  Menu,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -40,6 +41,7 @@ export default function AdminDashboardContent({
   const supabase = createClient();
 
   const [activeTab, setActiveTab] = useState<"orders" | "products" | "customizations">("orders");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [orders, setOrders] = useState(initialOrders);
   const [products, setProducts] = useState(initialProducts);
   const [settings, setSettings] = useState(initialSettings || {});
@@ -448,35 +450,36 @@ export default function AdminDashboardContent({
     <div className="flex flex-col min-h-dvh bg-primary-bg">
       {/* Admin Navbar */}
       <header className="sticky top-0 z-navbar bg-surface/85 backdrop-blur-md border-b border-outline-variant/30 text-on-surface">
-        <div className="mx-auto flex h-20 max-w-container-max items-center justify-between px-margin-mobile md:px-margin-desktop">
+        <div className="mx-auto flex h-16 md:h-20 max-w-container-max items-center justify-between px-4 md:px-margin-desktop w-full overflow-hidden">
           <Link
             href="/ibu-restifashop-dashboard"
-            className="font-serif text-headline-sm md:text-headline-md tracking-tight text-on-surface hover:opacity-85 transition-opacity flex items-center gap-2"
+            className="font-serif text-lg md:text-headline-md tracking-tight text-on-surface hover:opacity-85 transition-opacity flex items-center gap-1.5 md:gap-2 shrink-0"
           >
             <Image
               src="/logo.svg"
               alt="Restifashop Logo"
-              width={26}
-              height={26}
-              className="object-contain"
-             quality={95} />
-            <span>Restifashop</span>
-            <span className="font-sans text-[9px] uppercase font-bold tracking-widest text-on-surface-variant/70 border border-outline-variant rounded-md px-2 py-0.5 ml-1">
+              width={24}
+              height={24}
+              className="object-contain md:w-[26px] md:h-[26px]"
+              quality={95}
+            />
+            <span className="truncate">Restifashop</span>
+            <span className="hidden md:inline-block font-sans text-[9px] uppercase font-bold tracking-widest text-on-surface-variant/70 border border-outline-variant rounded-md px-2 py-0.5 ml-1">
               Dashboard
             </span>
           </Link>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4 shrink-0">
             <Link
               href="/"
-              className="font-sans text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors"
+              className="whitespace-nowrap font-sans text-[9px] md:text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors"
             >
               Lihat Toko
             </Link>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-1.5 font-sans text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
+              className="whitespace-nowrap flex items-center gap-1 md:gap-1.5 font-sans text-[9px] md:text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
             >
-              <LogOut className="h-4 w-4" /> Keluar
+              <LogOut className="h-3 w-3 md:h-4 md:w-4" /> <span className="hidden xs:inline sm:inline">Keluar</span>
             </button>
           </div>
         </div>
@@ -485,8 +488,8 @@ export default function AdminDashboardContent({
       {/* Main Admin Canvas */}
       <div className="flex-grow mx-auto w-full max-w-container-max px-margin-mobile md:px-margin-desktop py-10">
         
-        {/* Tab Selection Row */}
-        <div className="flex gap-4 border-b border-outline-variant/30 pb-4 mb-8">
+        {/* Desktop Tab Selection Row */}
+        <div className="hidden md:flex gap-4 border-b border-outline-variant/30 pb-4 mb-8">
           <button
             onClick={() => setActiveTab("orders")}
             className={`px-5 py-2.5 font-sans font-bold text-xs uppercase tracking-widest rounded-full cursor-pointer transition-all border ${
@@ -517,6 +520,52 @@ export default function AdminDashboardContent({
           >
             Kustomisasi
           </button>
+        </div>
+
+        {/* Mobile Tab Selection (Hamburger) */}
+        <div className="md:hidden mb-8">
+          <div className="flex justify-between items-center border-b border-outline-variant/30 pb-4">
+            <span className="font-sans font-bold text-xs uppercase tracking-widest text-on-surface">
+              {activeTab === 'orders' ? 'Kelola Pesanan' : activeTab === 'products' ? 'Kelola Produk' : 'Kustomisasi'}
+            </span>
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 rounded-md border border-outline-variant bg-surface text-on-surface-variant hover:bg-surface-variant/30 transition-colors cursor-pointer"
+            >
+              <Menu className="h-4 w-4" />
+            </button>
+          </div>
+          <AnimatePresence>
+            {isMobileMenuOpen && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="flex flex-col gap-2 pt-4 overflow-hidden"
+              >
+                {[
+                  { id: "orders", label: "Kelola Pesanan" },
+                  { id: "products", label: "Kelola Produk" },
+                  { id: "customizations", label: "Kustomisasi" }
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      setActiveTab(tab.id as any);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`text-left px-5 py-3 font-sans font-bold text-[10px] uppercase tracking-widest rounded-lg cursor-pointer transition-all border ${
+                      activeTab === tab.id
+                        ? "bg-on-surface text-surface border-on-surface"
+                        : "bg-surface border-outline-variant text-on-surface-variant hover:border-on-surface"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         <AnimatePresence mode="wait">
@@ -721,8 +770,8 @@ export default function AdminDashboardContent({
         ) : activeTab === "products" ? (
           <>
             {/* Products Control Row */}
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="font-serif text-headline-md text-on-surface">
+            <div className="flex justify-between items-center mb-6 gap-2">
+              <h2 className="font-serif text-xl md:text-headline-md text-on-surface">
                 Daftar Produk ({products.length})
               </h2>
               <button
@@ -743,9 +792,9 @@ export default function AdminDashboardContent({
                   setPSizeGuide("");
                   setIsAddProductOpen(true);
                 }}
-                className="flex items-center gap-1.5 px-5 py-2.5 bg-on-surface text-surface font-sans font-bold text-[10px] uppercase tracking-widest rounded-full hover:bg-surface-tint transition-all shadow-xs cursor-pointer"
+                className="flex items-center justify-center gap-1 md:gap-1.5 whitespace-nowrap flex-shrink-0 px-3 py-2 md:px-5 md:py-2.5 bg-on-surface text-surface font-sans font-bold text-[8px] md:text-[10px] uppercase tracking-widest rounded-full hover:bg-surface-tint transition-all shadow-xs cursor-pointer"
               >
-                <Plus className="h-4 w-4" /> Tambah Produk
+                <Plus className="h-3 w-3 md:h-4 md:w-4" /> Tambah Produk
               </button>
             </div>
 
