@@ -178,7 +178,7 @@ export default async function ShopPage({ searchParams }: PageProps) {
               </Link>
             );
 
-            if (idx === 2) {
+            if (idx === 2 || (products.length <= 2 && idx === products.length - 1)) {
               return [
                 productCardElement,
                 <div
@@ -194,20 +194,22 @@ export default async function ShopPage({ searchParams }: PageProps) {
                       src={shopBanner.image}
                       quality={95}
                     />
-                    <div className="absolute bottom-4 left-4 right-4 md:right-auto md:left-6 md:bottom-6 md:max-w-xs rounded-lg border border-outline-variant/30 bg-surface/90 p-4 md:p-6 text-left shadow-sm backdrop-blur-xl animate-scale-up">
-                      <h4 className="mb-1 font-headline-md text-headline-md text-on-background">
-                        {shopBanner.title}
-                      </h4>
-                      <p className="mb-3 font-body-md text-xs text-secondary md:text-sm">
-                        {shopBanner.description}
-                      </p>
-                      <Link
-                        href={shopBanner.link}
-                        className="gold-button relative inline-block overflow-hidden rounded-full bg-primary-container px-4 py-2 text-xs font-label-caps uppercase tracking-widest text-on-primary-container"
-                      >
-                        <span className="relative z-10">Lihat Koleksi</span>
-                        <div className="absolute inset-0 transform -translate-x-full bg-white/20 transition-transform duration-700 ease-in-out group-hover:translate-x-full" />
-                      </Link>
+                    <div className="absolute inset-0 flex items-end justify-start p-4 md:p-6 pointer-events-none">
+                      <div className="w-full md:w-[320px] rounded-lg border border-outline-variant/30 bg-surface/90 p-4 md:p-6 text-left shadow-sm backdrop-blur-xl animate-scale-up pointer-events-auto">
+                        <h4 className="mb-1 font-headline-md text-headline-md text-on-background">
+                          {shopBanner.title}
+                        </h4>
+                        <p className="mb-3 font-body-md text-xs text-secondary md:text-sm">
+                          {shopBanner.description}
+                        </p>
+                        <Link
+                          href={shopBanner.link}
+                          className="gold-button relative inline-block overflow-hidden rounded-full bg-primary-container px-4 py-2 text-xs font-label-caps uppercase tracking-widest text-on-primary-container"
+                        >
+                          <span className="relative z-10">Lihat Koleksi</span>
+                          <div className="absolute inset-0 transform -translate-x-full bg-white/20 transition-transform duration-700 ease-in-out group-hover:translate-x-full" />
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>,
