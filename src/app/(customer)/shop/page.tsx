@@ -185,7 +185,7 @@ export default async function ShopPage({ searchParams }: PageProps) {
                   key="resort-collection-banner"
                   className="group product-card block text-left lg:col-span-2"
                 >
-                  <div className="relative mb-6 aspect-[16/9] overflow-hidden rounded-2xl border border-outline-variant/20 bg-surface-container-low shadow-xs md:aspect-[8/5]">
+                  <div className="relative mb-6 aspect-square overflow-hidden rounded-2xl border border-outline-variant/20 bg-surface-container-low shadow-xs md:aspect-[8/5]">
                     <Image
                       className="h-full w-full object-cover"
                       alt={shopBanner.title}
@@ -194,7 +194,7 @@ export default async function ShopPage({ searchParams }: PageProps) {
                       src={shopBanner.image}
                       quality={95}
                     />
-                    <div className="absolute bottom-6 left-6 max-w-xs rounded-lg border border-outline-variant/30 bg-surface/90 p-4 text-left shadow-sm backdrop-blur-xl md:p-6 animate-scale-up">
+                    <div className="absolute bottom-4 left-4 right-4 md:right-auto md:left-6 md:bottom-6 md:max-w-xs rounded-lg border border-outline-variant/30 bg-surface/90 p-4 md:p-6 text-left shadow-sm backdrop-blur-xl animate-scale-up">
                       <h4 className="mb-1 font-headline-md text-headline-md text-on-background">
                         {shopBanner.title}
                       </h4>
