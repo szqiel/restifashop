@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Libre_Caslon_Text, DM_Sans } from "next/font/google";
 import "./globals.css";
 
@@ -14,10 +14,15 @@ const dmSans = DM_Sans({
   variable: "--font-sans",
 });
 
+export const viewport: Viewport = {
+  themeColor: "#d4af37",
+};
+
 export const metadata: Metadata = {
   title: "Restifashop — Premium Bedding & Sleep Essentials",
   description: "Quiet luxury bedding for the discerning home. Experience premium sprei, bedcovers, and sleep accessories crafted for ultimate comfort.",
   keywords: ["sprei", "bedcover", "selimut", "luxury bedding", "Restifashop"],
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({

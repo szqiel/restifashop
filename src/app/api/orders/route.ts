@@ -2,6 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { generateWhatsAppLink } from "@/lib/whatsapp";
 import { CartItem } from "@/types";
+import webpush from "web-push";
+
+const vapidEmail = process.env.VAPID_EMAIL || "mailto:admin@restifashop.com";
+const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || "";
+const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY || "";
+
+if (vapidPublicKey && vapidPrivateKey) {
+  webpush.setVapidDetails(vapidEmail, vapidPublicKey, vapidPrivateKey);
+}
 
 const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseUrl = (rawUrl && rawUrl.startsWith("http")) ? rawUrl : "https://placeholder-url.supabase.co";
@@ -189,6 +198,41 @@ export async function POST(req: NextRequest) {
       .from("orders")
       .update({ whatsapp_message: decodedMessage })
       .eq("id", order.id);
+
+    // 8. Trigger Web Push Notifications to Admins
+    if (vapidPublicKey && vapidPrivateKey && !isPlaceholder) {
+      try {
+        const { data: subs, error: subsError } = await supabase
+          .from("admin_subscriptions")
+          .select("*");
+
+        if (!subsError && subs && subs.length > 0) {
+          const payload = JSON.stringify({
+            title: "🚨 Pesanan Baru!",
+            body: `${customer_name} telah memesan dengan total Rp ${subtotal.toLocaleString("id-ID")}`,
+            url: "/ibu-restifashop-dashboard",
+            icon: "/images/icon-192x192.png"
+          });
+
+          const pushPromises = subs.map((sub: any) => {
+            const pushSubscription = {
+              endpoint: sub.endpoint,
+              keys: {
+                auth: sub.keys_auth,
+                p256dh: sub.keys_p256dh,
+              },
+            };
+            return webpush.sendNotification(pushSubscription, payload).catch((e) => {
+              console.error("Error sending push to endpoint", sub.endpoint, e);
+            });
+          });
+
+          await Promise.all(pushPromises);
+        }
+      } catch (pushErr) {
+        console.error("Failed to send push notifications", pushErr);
+      }
+    }
 
     return NextResponse.json({
       success: true,

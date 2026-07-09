@@ -23,6 +23,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import PushNotificationManager from "@/components/PushNotificationManager";
 
 interface AdminDashboardContentProps {
   initialOrders: any[];
@@ -528,6 +529,7 @@ export default function AdminDashboardContent({
           >
             {activeTab === "orders" ? (
           <>
+            <PushNotificationManager />
             {/* Stat Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
               {/* Card 1: Total Orders */}

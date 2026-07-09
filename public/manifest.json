@@ -1,0 +1,17 @@
+{
+  "name": "Restifashop Admin Dashboard",
+  "short_name": "Restifashop",
+  "description": "Admin dashboard for Restifashop orders and products",
+  "start_url": "/ibu-restifashop-dashboard",
+  "display": "standalone",
+  "background_color": "#FAFAFA",
+  "theme_color": "#d4af37",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
