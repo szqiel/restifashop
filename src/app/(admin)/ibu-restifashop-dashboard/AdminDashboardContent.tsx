@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface AdminDashboardContentProps {
   initialOrders: any[];
@@ -517,7 +518,15 @@ export default function AdminDashboardContent({
           </button>
         </div>
 
-        {activeTab === "orders" ? (
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+          >
+            {activeTab === "orders" ? (
           <>
             {/* Stat Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
@@ -1128,6 +1137,8 @@ export default function AdminDashboardContent({
             )}
           </>
         ) : null}
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       {/* Order Detail Modal */}

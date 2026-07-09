@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Product } from "@/types";
 import { useCartStore } from "@/store/useCartStore";
 import { ChevronDown, ArrowRight, Check, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ProductDetailContentProps {
   product: Product;
@@ -102,7 +103,19 @@ export default function ProductDetailContent({
   };
 
   return (
-    <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12 md:py-20 text-left">
+    <>
+      <motion.div 
+      initial="hidden"
+      animate="visible"
+      variants={{
+        hidden: { opacity: 0 },
+        visible: {
+          opacity: 1,
+          transition: { staggerChildren: 0.1, delayChildren: 0.2 }
+        }
+      }}
+      className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12 md:py-20 text-left"
+    >
       {/* Back to collections link */}
       <Link
         href="/shop"
@@ -113,7 +126,13 @@ export default function ProductDetailContent({
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-gutter items-start">
         {/* Left Column: Image Gallery */}
-        <div className="md:col-span-7 flex flex-col gap-4">
+        <motion.div 
+          variants={{
+            hidden: { opacity: 0, y: 30 },
+            visible: { opacity: 1, y: 0, transition: { type: "spring", damping: 25, stiffness: 200 } }
+          }}
+          className="md:col-span-7 flex flex-col gap-4"
+        >
           <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden bg-surface-container-low border border-outline-variant/20 shadow-xs">
               <Image
                 src={product.images[activeImageIndex] || "https://via.placeholder.com/600x800"}
@@ -149,10 +168,16 @@ export default function ProductDetailContent({
               ))}
             </div>
           )}
-        </div>
+        </motion.div>
 
         {/* Right Column: Info & Options */}
-        <div className="md:col-span-5 flex flex-col gap-6 md:pl-4">
+        <motion.div 
+          variants={{
+            hidden: { opacity: 0, y: 30 },
+            visible: { opacity: 1, y: 0, transition: { type: "spring", damping: 25, stiffness: 200 } }
+          }}
+          className="md:col-span-5 flex flex-col gap-6 md:pl-4"
+        >
           {/* Title & Price */}
           <div className="space-y-3">
             <span className="block font-sans font-bold text-[10px] text-primary uppercase tracking-widest">
@@ -258,19 +283,23 @@ export default function ProductDetailContent({
 
         {/* Action Area */}
         <div className="flex flex-col gap-4 mt-4">
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={handleAddToCart}
             disabled={product.stock === 0}
-            className="w-full rounded-full bg-black hover:bg-[#735c00] transition-colors duration-300 px-6 py-4 font-label-caps text-label-caps uppercase tracking-widest text-white active:scale-[0.97] flex items-center justify-center gap-2 shadow-sm cursor-pointer disabled:opacity-50"
+            className="w-full rounded-full bg-black hover:bg-[#735c00] transition-colors duration-300 px-6 py-4 font-label-caps text-label-caps uppercase tracking-widest text-white flex items-center justify-center gap-2 shadow-sm cursor-pointer disabled:opacity-50"
           >
             <span>{addedToCart ? "Dimasukkan ke Keranjang" : "Tambah ke Keranjang"}</span>
             <ArrowRight className="h-4.5 w-4.5" />
-          </button>
+          </motion.button>
 
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={handleWhatsAppCheckout}
             disabled={product.stock === 0}
-            className="gold-button w-full rounded-full bg-primary-container px-6 py-4 font-label-caps text-label-caps uppercase tracking-widest text-on-primary-container active:scale-[0.97] flex items-center justify-center gap-2 relative overflow-hidden group cursor-pointer"
+            className="gold-button w-full rounded-full bg-primary-container px-6 py-4 font-label-caps text-label-caps uppercase tracking-widest text-on-primary-container flex items-center justify-center gap-2 relative overflow-hidden group cursor-pointer"
           >
             <span className="relative z-10 flex items-center gap-2">
               <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -279,7 +308,7 @@ export default function ProductDetailContent({
               Pesan via WhatsApp
             </span>
             <div className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
-          </button>
+          </motion.button>
         </div>
 
         {/* Accordion Details */}
@@ -316,8 +345,9 @@ export default function ProductDetailContent({
             </div>
           </details>
         </div>
-      </div>
+      </motion.div>
     </div>
+    </motion.div>
 
     {relatedProducts.length > 0 && (
       <div className="mt-16 border-t border-outline-variant/20 pt-12">
@@ -367,13 +397,24 @@ export default function ProductDetailContent({
     )}
 
     {/* Size Guide Modal */}
+    <AnimatePresence>
       {isSizeGuideOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-          <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-300"
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 bg-black/40 backdrop-blur-xs"
             onClick={() => setIsSizeGuideOpen(false)}
           />
-          <div className="surface-panel relative z-10 w-full max-w-md rounded-2xl p-6 md:p-8 text-left shadow-xl animate-scale-up">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            transition={{ type: "spring", damping: 25, stiffness: 250 }}
+            className="surface-panel relative z-10 w-full max-w-md rounded-2xl p-6 md:p-8 text-left shadow-xl"
+          >
             <button
               onClick={() => setIsSizeGuideOpen(false)}
               className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full hover:bg-surface-variant/40 text-on-surface-variant cursor-pointer"
@@ -432,9 +473,10 @@ export default function ProductDetailContent({
             >
               Tutup
             </button>
-          </div>
+          </motion.div>
         </div>
       )}
-    </div>
+    </AnimatePresence>
+    </>
   );
 }

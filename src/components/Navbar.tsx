@@ -6,6 +6,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useCartStore } from "@/store/useCartStore";
 import { Search, ShoppingBag, Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -38,7 +39,12 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-outline-variant/30 bg-surface/90 backdrop-blur-xl transition-all duration-300">
+    <motion.header 
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ type: "spring", stiffness: 200, damping: 20 }}
+      className="sticky top-0 z-50 w-full border-b border-outline-variant/30 bg-surface/90 backdrop-blur-xl transition-all duration-300"
+    >
       <div className="section-shell flex h-24 items-center justify-between relative">
         {/* Mobile menu and Brand Logo left-aligned */}
         <div className="flex items-center gap-2">
@@ -78,13 +84,20 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className={`transition-all duration-300 hover:opacity-80 ${
+                className={`transition-all duration-300 hover:opacity-80 relative ${
                   isActive
-                    ? "text-primary font-bold border-b-2 border-primary pb-1"
+                    ? "text-primary font-bold"
                     : "text-on-surface-variant hover:text-primary"
                 }`}
               >
                 {link.name}
+                {isActive && (
+                  <motion.div
+                    layoutId="navbar-active-indicator"
+                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary"
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  />
+                )}
               </Link>
             );
           })}
@@ -101,37 +114,54 @@ export default function Navbar() {
           </Link>
 
           {/* Shopping Bag */}
-          <button
+          <motion.button
+            whileTap={{ scale: 0.9 }}
             onClick={() => setIsOpen(true)}
-            className="p-2 hover:opacity-80 transition-all active:scale-95 duration-150 flex items-center justify-center relative"
+            className="p-2 hover:opacity-80 transition-all active:scale-95 duration-150 flex items-center justify-center relative cursor-pointer"
           >
             <ShoppingBag className="h-6 w-6 stroke-[1.5]" />
-            {cartCount > 0 && (
-              <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary-container px-1 text-[9px] font-bold text-on-primary-container">
-                {cartCount}
-              </span>
-            )}
-          </button>
+            <AnimatePresence>
+              {cartCount > 0 && (
+                <motion.span 
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                  className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary-container px-1 text-[9px] font-bold text-on-primary-container"
+                >
+                  {cartCount}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </motion.button>
         </div>
       </div>
 
       {/* Mobile Navigation Drawer */}
-      {isMobileMenuOpen && (
-        <div className="absolute top-24 left-0 w-full bg-surface/98 border-b border-outline-variant/30 shadow-md md:hidden animate-fade-in z-50">
-          <nav className="flex flex-col py-4">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className="px-margin-mobile py-4 font-sans text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-dim hover:text-primary border-b border-outline-variant/20 last:border-0"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {link.name}
-              </Link>
-            ))}
-          </nav>
-        </div>
-      )}
-    </header>
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 200, damping: 25 }}
+            className="absolute top-24 left-0 w-full bg-surface/98 border-b border-outline-variant/30 shadow-md md:hidden z-50 overflow-hidden"
+          >
+            <nav className="flex flex-col py-4">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="px-margin-mobile py-4 font-sans text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-dim hover:text-primary border-b border-outline-variant/20 last:border-0"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.header>
   );
 }
